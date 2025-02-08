@@ -1,0 +1,269 @@
+.contenedor-principal, .contenedor-secundario{
+    padding: 0 !important;
+}
+
+/* ===============================================  CONTENDEDOR DE LA TABLA ============================= */
+
+.contenedor-secundario{
+    & h4{
+        margin-left: 4px;
+    }
+
+    & h4{
+        color: #566a7f;
+    }
+    
+    & h4 span{
+        color: #a1acb8 !important;
+    }
+}
+
+
+.titulo-tabla{
+    font-size: 18px;
+    padding: 14px;
+    color: #566a7f;
+    letter-spacing: 1px;
+    font-weight: 500;
+}
+.table-responsive {
+    position: relative;
+    max-height: 44vh;
+    overflow-y: auto;
+    overflow-x: auto;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+}
+
+.tabla-general {
+    table-layout: auto;
+    width: 100%;
+    border-collapse: collapse;
+
+    & thead{
+        position: sticky;
+        top: 0;
+        left: 0;
+        color: #566a7f;
+        z-index: 1;
+        /* Asegura que el encabezado se quede arriba */
+        display: table-header-group;
+        border-bottom: 2px solid #d9dee3;
+
+        /* Asegura que se mantenga dentro del flujo de la tabla */
+    }
+
+    & thead tr th{
+        background-color: #fcfdfd;
+    }
+
+    & tbody{
+        display: table-row-group;
+        width: 100%;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        color: #19727A;
+
+    }
+
+    /* Borde horizontal entre filas */
+    & td, th{
+        border-bottom: 1px solid #d9dee3;
+        /* border-top: 2px solid #d9dee3; */
+        color: #19727A;
+        font-size: 15px;
+        font-weight: 500;
+        text-align: center;
+        word-wrap: break-word;
+        /* padding: 0.75rem;
+        word-wrap: break-word;
+        white-space: nowrap; */
+        
+    }
+    & th{
+        color: #566a7f;
+        font-size: 13px;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+    /* ¿Eliminar el borde inferior de la última fila */
+    & tr:last-child td, tr:last-child th{
+        border-bottom: none;
+    }
+}
+
+
+/* Contenedor de la paginación */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+    padding: 0;
+    list-style: none;
+
+    & .page-item {
+        margin: 0 5px;
+    }
+    
+    & .page-item button {
+        background-color: #f0f2f4;
+        color: #697a8d;
+        border: 0px solid #d9dee3;
+        padding: 8px 12px;
+        font-size: 14px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    /* Hover: cambia el fondo y borde */
+    & .page-item button:hover {
+        background-color: #d9dee3;
+        border-color: #d9dee3;   
+    }
+
+    /* Active: resalta el botón actual con un color diferente */
+    & .page-item.active button {
+        background-color: #696cff;  /* Color más oscuro para el botón activo */
+        border-color: #696cff;
+        box-shadow: 0 0.125rem 0.25rem rgba(105, 108, 255, 0.4);
+        color: #ffffff;
+    }
+
+    /* Disabled: desactiva los botones */
+    & .page-item.disabled button {
+        background-color: #dcdcdc;
+        border-color: #dcdcdc;
+        color: #9e9e9e;
+        cursor: not-allowed;
+    }
+}
+
+/* Ajuste de tamaño en pantallas pequeñas */
+@media (max-width: 576px) {
+    .pagination .page-item button {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+}
+
+.card {
+    border: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    border-radius: 10px !important;
+
+    & .card-body h5{
+        font-size: 17.4px;
+        color: #566a7f;
+        font-weight: 500;
+    }
+
+    & .card .card-body p{
+        font-size: 17.4px;
+        color: #566a7f;
+        font-weight: 500;
+    }
+
+    & .card-body label{
+        font-size: 12px;
+        color: #697a8d;
+        font-weight: 500;
+    }
+}
+
+.ver{
+    cursor: default;
+}
+
+input, textarea, select{
+    font-weight: 400 !important;
+    font-size: 14px !important;
+}
+
+input:focus, textarea:focus, select:focus {
+    border-color: #603fdb !important; 
+    box-shadow: none !important; 
+}
+input::placeholder, textarea::placeholder {
+    color: #c8c7cf !important;
+    opacity: 1 !important; 
+}
+select{
+    color: #697a8d !important;
+
+    & option{
+        color: #697a8d !important;
+    }
+}
+
+/* ************************************** BOTONES DEL MODAL RETROCEDER Y REGRESAR ******************** */
+.btn_buscar{
+    background-color: #696cff;  
+    border-color: #696cff;
+    box-shadow: 0 0.125rem 0.25rem rgba(105, 108, 255, 0.4);
+    color: #ffffff;
+}
+.btn_buscar:hover {
+    background-color: #5a56d7; 
+    border-color: #5a56d7;
+    box-shadow: 0 0.125rem 0.25rem rgba(90, 86, 215, 0.6);
+}
+/* ******************************************************************************************* */
+
+.ver_pass{
+    font-size: 13px;
+    color: #697a8d;
+}
+
+/* ************************************** BOTONES DEL MODAL RETROCEDER Y REGRESAR ******************** */
+.modal-body{
+    & .btn-registrar{
+        background-color: #19727A; 
+        margin-left: 20px;
+        margin-bottom: 20px;
+        color: #ffffff; 
+        max-width: 150px !important; 
+        height: 37px;
+        font-weight: 500;
+    }
+    & .btn-registrar:hover{
+        background-color: #135458; 
+        color: #ffffff; 
+        border: 1px solid #135458;
+    }
+    & .btn-retroceder{
+        background-color: #A72307; 
+        margin-left: 20px;
+        margin-bottom: 20px;
+        color: #ffffff; 
+        max-width: 250px !important; 
+        height: 37px;
+        font-weight: 500;
+        padding: 0 20px;
+    }
+    & .btn-retroceder:hover{
+        background-color: #971e06; 
+        color: #ffffff; 
+        border: 1px solid #971e06;
+    }
+}
+/* ******************************************************************************************* */
+
+
+/* ************************************** VALIDACION DE CAMPO OBLIGATORIO ******************** */
+.campo_obligatorio{
+    color: #ff0000;  
+    font-weight: bold; 
+    font-size: 12px;
+}
+
+.asterisco{
+    color: #ff0000;
+}
+
+.asterisco:hover{
+    cursor: pointer;
+}
+/* ******************************************************************************************* */
+
+
