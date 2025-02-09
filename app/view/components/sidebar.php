@@ -29,7 +29,13 @@
                     <span>Inicio</span>
                 </a>
             </li>
-            <li class="menu-item menu-item-dropdown">
+            <li class="menu-item menu-item-static">
+                <a href="../agenda/agendas.php" class="menu-link">
+                    <i class="fa-solid fa-calendar"></i>
+                    <span>Agenda</span>
+                </a>
+            </li>
+<!--             <li class="menu-item menu-item-dropdown">
                 <a href="" class="menu-link subMenuBtn">
                     <i class="fa-solid fa-calendar"></i>
                     <span>Agenda</span>
@@ -40,7 +46,7 @@
                     <li><a href="../agenda/agendas.php" class="sub-menu-link">Agenda</a></li>
                     <li><a href="#" class="sub-menu-link">Buscar</a></li>
                 </ul>
-            </li>
+            </li> -->
             <li class="menu-item menu-item-static">
                 <a href="../usuarios/usuarios.php" class="menu-link">
                     <i class="fa-solid fa-user"></i>

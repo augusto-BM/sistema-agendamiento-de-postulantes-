@@ -220,9 +220,7 @@ require_once '../../../config/datossesion/datossesion.php'
                     <div class="col-md-3">
                         <label for="fecha_agenda" class="form-label">FECHA DE AGENDA <span class="asterisco"
                                 title="Campo obligatorio">*</span></label>
-
-                        <input type="date" id="fecha_agenda" name="fecha_agenda" class="form-control"
-                            value="">
+                        <input type="date" id="fecha_agenda" name="fecha_agenda" class="form-control" value="" min="<?php echo date('Y-m-d', strtotime('+1 day')); ?>">
                         <div class="invalid-feedback">Este campo es obligatorio.</div>
                     </div>
                 </div>
@@ -253,6 +251,52 @@ require_once '../../../config/datossesion/datossesion.php'
 
         // Asignar el valor al input invisible
         document.getElementById('nombre_sede').value = nombreSede;
+    });
+</script>
+<div class="col-md-3">
+    <label for="fecha_agenda" class="form-label">FECHA DE AGENDA <span class="asterisco" title="Campo obligatorio">*</span></label>
+    <input type="date" id="fecha_agenda" name="fecha_agenda" class="form-control" value=""
+           min="<?php echo date('Y-m-d', strtotime('+1 day')); ?>">
+    <div class="invalid-feedback">Este campo es obligatorio.</div>
+</div>
+
+<script>
+    // Guardamos el valor inicial del campo de fecha
+    const fechaInput = document.getElementById('fecha_agenda');
+    let initialValue = fechaInput.value;
+
+    // Escuchar cuando el valor del campo cambia
+    fechaInput.addEventListener('change', function(event) {
+        // Mostrar el valor seleccionado para verificar la entrada
+        console.log("Fecha seleccionada: ", event.target.value);
+
+        // Crear una fecha con la zona horaria UTC para evitar desplazamientos por zona horaria
+        const selectedDate = new Date(event.target.value + "T00:00:00Z");
+        
+        // Obtener la fecha de hoy
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Aseguramos que solo compare la fecha sin la hora
+
+        // Mostrar la fecha en formato de día de la semana
+        console.log("Día de la semana (0=Domingo, 6=Sábado): ", selectedDate.getUTCDay());
+
+        // Verificar si el día de la semana es domingo (0 es domingo)
+        if (selectedDate.getUTCDay() === 0) {
+            alert("No puedes seleccionar un domingo.");
+            // Restauramos el valor original del input si es domingo
+            event.target.value = initialValue;
+        }
+        // Verificar si la fecha seleccionada es anterior al día de hoy
+        else if (selectedDate < today) {
+            alert("No puedes seleccionar una fecha anterior al día de hoy.");
+            // Restauramos el valor original del input si es fecha anterior a hoy
+            event.target.value = initialValue;
+        }
+    });
+
+    // Para manejar el caso de que el valor inicial se modifique fuera del evento (por ejemplo, con un valor predeterminado)
+    fechaInput.addEventListener('focus', function() {
+        initialValue = fechaInput.value;
     });
 </script>
 

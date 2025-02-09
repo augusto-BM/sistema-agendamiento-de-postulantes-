@@ -59,7 +59,6 @@ if (isset($_SESSION['activo'])) {
                                     </button></h4>
                                     
                                 <?php
-                                require_once '../components/modalDinamico.php'; 
                                 require_once '../../controller/sedes/sedesController.php';
                                 require_once '../../controller/usuarios/usuariosController.php';
 

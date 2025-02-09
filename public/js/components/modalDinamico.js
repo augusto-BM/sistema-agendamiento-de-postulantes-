@@ -1,4 +1,4 @@
-//console.log("modal dinámico cargado");
+console.log("modal dinámico cargado");
 $(document).on('click', '.abrirModal', function(event) {
     event.preventDefault();
     console.log("Botón de modal clickeado");

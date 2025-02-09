@@ -5,6 +5,8 @@
         <a href="" class="abrirModal" title="Calendario" data-id="calendario" data-titulo="Dias no laborables"
             data-prefix="Calendario/"><i class="fa-solid fa-calendar-days"></i></a>
         <!-- <a href="#"><i class="fa-solid fa-cake-candles"></i></a> -->
+
+        <!-- MODAL DINÁMICO -->
         <?php require_once '../components/modalDinamico.php'; ?>
 
     </div>

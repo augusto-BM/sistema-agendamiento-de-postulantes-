@@ -90,8 +90,7 @@ if (isset($_SESSION['activo'])) {
                                     </button>
                                 </div>
 
-                                <!-- MODAL DINÁMICO -->
-                                <?php require_once '../components/modalDinamico.php'; ?>
+                                
 
                             </div>
                         </div>
