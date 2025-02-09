@@ -1,4 +1,4 @@
-//console.log("JS de agendas");
+console.log("JS de agendas");
 
 $(document).ready(function () {
   // Función para filtrar las asistencias por las fechas seleccionadas

@@ -10,7 +10,7 @@ define('SECCION', 'agenda');
 define('ARCHIVOS_CSS', ['tablaUsuarios']);
 
 //Nombre de los archivos JS a importar en esta vista
-define('ARCHIVOS_JS', ['agendas']);
+define('ARCHIVOS_JS', ['ajaxListarAgendas']);
 
 //Incluir las rutas dinamicos
 require_once '../../../config/rutas/rutas.php';
@@ -50,14 +50,15 @@ if (isset($_SESSION['activo'])) {
                         <div class="content-wrapper">
                             <div class="container-xxl flex-grow-1 container-p-y contenedor-secundario">
                                 <h4 class="fw-bold py-3 mb-1"><span class="text-muted fw-light">Agenda /</span>
-                                    Agendas                                     <!-- Botón para añadir usuario -->
+                                    Agendas <!-- Botón para añadir usuario -->
                                     <button type="button" class="btn btn-primary abrirModal"
                                         style="background-color: #19727A; color: white; border: 0px; margin-left: 20px;"
                                         data-id="registrarAgenda" data-prefix="Agenda/"
                                         data-titulo="Agendar Postulante">
                                         Registar <i class="fa-solid fa-plus"></i>
-                                    </button></h4>
-                                    
+                                    </button>
+                                </h4>
+
                                 <?php
                                 require_once '../../controller/sedes/sedesController.php';
                                 require_once '../../controller/usuarios/usuariosController.php';
@@ -67,8 +68,12 @@ if (isset($_SESSION['activo'])) {
 
                                 $obj2 = new usuariosController();
                                 $reclutadores = $obj2->listarReclutadores();
+
+                                $soloRolPermitido = in_array($idrol, [2, 4]); //MODERADOR y ADMIN 
+                                $displayCompleto = $soloRolPermitido ? '' : 'display: none;';
+                                $idBtnAcceso = $soloRolPermitido ? 'btn_filtroCompleto' : 'btn_filtroRestringido';
                                 ?>
-                                <div class="row filtradoFecha">
+                                <div class="row filtradoFecha" style="<?= $displayCompleto; ?>">
                                     <!-- SELECT PARA FILTRAR LAS SEDES -->
                                     <div class="col-md-3">
                                         <label class="form-label" for="filtroSedes">Sede</label>
@@ -102,11 +107,10 @@ if (isset($_SESSION['activo'])) {
                                                     <option value="<?= $reclutador->idusuario; ?>"><?= $reclutador->nombreusuario; ?></option>
                                                 <?php endforeach; ?>
                                             <?php else: ?>
-                                                <option value="" disabled>No hay sedes disponibles</option>
+                                                <option value="" disabled>No hay reclutadores disponibles</option>
                                             <?php endif; ?>
                                         </select>
                                     </div>
-
                                 </div>
 
                                 <div class="row mt-2 filtradoFecha">
@@ -140,7 +144,7 @@ if (isset($_SESSION['activo'])) {
                                             </div>
                                             <div class="col-md-4 d-flex flex-column justify-content-end">
                                                 <div class="fecha_col">
-                                                    <button id="btnBuscarAgenda" class="btn btn-primary btn_buscar">Buscar</button>
+                                                    <button id="<?= $idBtnAcceso; ?>" class="btn btn-primary btn_buscar">Buscar</button>
                                                 </div>
                                             </div>
                                         </div>

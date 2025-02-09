@@ -84,14 +84,14 @@ $date = $obj3->mostrarUsuario($identificador);
                         <select type="text" id="id_empresa" name="id_empresa" class="form-control" required>
                             <option value="" disabled selected>SELECCIONE</option>
                             <?php if ($sedes): ?>
-                            <?php foreach ($sedes as $sede): ?>
-                            <option value="<?= $sede->idempresa; ?>"
-                                <?= ($sede->idempresa == $date->idempresa) ? 'selected' : ''; ?>>
-                                <?= $sede->nombreempresa; ?>
-                            </option>
-                            <?php endforeach; ?>
+                                <?php foreach ($sedes as $sede): ?>
+                                    <option value="<?= $sede->idempresa; ?>"
+                                        <?= ($sede->idempresa == $date->idempresa) ? 'selected' : ''; ?>>
+                                        <?= $sede->nombreempresa; ?>
+                                    </option>
+                                <?php endforeach; ?>
                             <?php else: ?>
-                            <option value="" disabled>No hay empresas activas</option>
+                                <option value="" disabled>No hay empresas activas</option>
                             <?php endif; ?>
                         </select>
 
@@ -115,13 +115,13 @@ $date = $obj3->mostrarUsuario($identificador);
                         <select type="text" id="id_rol" name="id_rol" class="form-control" required>
                             <option value="" disabled selected>SELECCIONE</option>
                             <?php if ($roles): ?>
-                            <?php foreach ($roles as $rol): ?>
-                            <option value="<?= $rol->idrol; ?>" <?= ($rol->idrol == $date->idrol) ? 'selected' : ''; ?>>
-                                <?= $rol->nombrerol; ?>
-                            </option>
-                            <?php endforeach; ?>
+                                <?php foreach ($roles as $rol): ?>
+                                    <option value="<?= $rol->idrol; ?>" <?= ($rol->idrol == $date->idrol) ? 'selected' : ''; ?>>
+                                        <?= $rol->nombrerol; ?>
+                                    </option>
+                                <?php endforeach; ?>
                             <?php else: ?>
-                            <option value="" disabled>No hay roles</option>
+                                <option value="" disabled>No hay roles</option>
                             <?php endif; ?>
                         </select>
 
@@ -167,4 +167,105 @@ $date = $obj3->mostrarUsuario($identificador);
     </form>
 </div>
 
-<script src="../../../public/js/usuarios/ajaxActualizarUsuario.js"></script>
+<script>
+    console.log("Script archivo editar usuario ...");
+
+    // Función para mostrar alertas con SweetAlert2 o alert tradicional
+    function mostrarAlertaEditar(tipo, titulo, mensaje) {
+        if (typeof Swal !== "undefined") {
+            Swal.fire({
+                icon: tipo,
+                title: titulo,
+                text: mensaje,
+                confirmButtonText: "Aceptar",
+                timer: 1000,
+                timerProgressBar: true,
+                didOpen: () => Swal.showLoading(),
+                willClose: () => {
+                    $(".formulario_editarUsuario")[0].reset();
+                    $("#modalDinamico").modal("hide");
+                },
+            });
+        } else {
+            alert(mensaje);
+        }
+    }
+
+    // Llamar a las funciones dentro de document.ready
+    $(document).ready(function() {
+
+        // Llamar a las funciones para los campos correspondientes
+        convertirAMayusculas("#nombre_colaborador, #correo_electronico");
+        prevenirNumeros("#nombre_colaborador");
+        prevenirLetras("#numero_documento, #celular");
+
+        // Validación de formulario
+        $(".formulario_editarUsuario").submit(async function(event) {
+            event.preventDefault(); // Prevenir el envío tradicional del formulario
+
+            let isValid = true;
+            $(".form-control").removeClass("is-invalid");
+            $(".invalid-feedback").hide();
+
+            // Validación de campos específicos
+            const validaciones = [
+                validarCampo("#nombre_colaborador", /^[a-zA-Z\s]+$/, "El nombre solo puede contener letras y espacios."),
+                validarCampo("#numero_documento", null, "El numero de documento es obligatorio y debe ser numérico."),
+                validarCampo("#correo_electronico", /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/, "El correo electrónico es inválido."),
+                validarCampo("#pass", /^.{4,}$/, "La contraseña es inválida, debe ser mayor a tres caracteres."),
+                validarCampo("#celular", /^[0-9]{9}$/, "El celular debe tener 9 dígitos."),
+            ];
+
+            validaciones.forEach((validation) => {
+                if (!validation.isValid) {
+                    isValid = false;
+                    $(validation.selector)
+                        .addClass("is-invalid")
+                        .next(".invalid-feedback")
+                        .text(validation.errorMessage)
+                        .show();
+                }
+            });
+
+            // Validaciones de campos seleccionados
+            const camposRequeridos = ["#tipo_documento", "#empresa_id", "#turno", "#rol", "#fecha_ingreso"];
+            camposRequeridos.forEach((selector) => {
+                if ($(selector).val() === "") {
+                    isValid = false;
+                    $(selector).addClass("is-invalid").next(".invalid-feedback").show();
+                }
+            });
+
+            // Si todo es válido, enviar el formulario
+            if (isValid) {
+                const formData = $(".formulario_editarUsuario").serialize(); // Serializar los datos del formulario
+
+                try {
+                    const response = await fetch("update.php", {
+                        method: "POST",
+                        body: formData,
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded", // Tipo de contenido de la solicitud
+                        },
+                    });
+
+                    const data = await response.json(); // Parseamos la respuesta como JSON
+
+                    console.log(data);
+                    if (data.success) {
+                        mostrarAlertaEditar("success", "¡Éxito!", data.message);
+                    } else {
+                        mostrarAlertaEditar("error", "Error", data.message);
+                    }
+
+                    // Cargar usuarios después de la edición
+                    cargarUsuarios($("#filtroSedes").val(), page, limit);
+
+                } catch (error) {
+                    console.error("Error en la solicitud:", error);
+                    alert("Hubo un error al editar los datos.");
+                }
+            }
+        });
+    });
+</script>

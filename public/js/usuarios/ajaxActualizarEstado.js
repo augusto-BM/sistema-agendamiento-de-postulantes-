@@ -14,7 +14,7 @@ function mostrarAlertaEstado(titulo, texto, tipo) {
 // Función para manejar el cambio de estado de un usuario
 async function handleEstadoChange(usuario_id, estadoActual) {
   const nuevoEstado = estadoActual === 2 ? 3 : 2; // Cambiar de ACTIVO a INACTIVO o viceversa
-  
+
   // Verificar si SweetAlert2 está disponible
   if (typeof Swal !== 'undefined') {
     // Mostrar SweetAlert2 para confirmar el cambio de estado
@@ -25,57 +25,59 @@ async function handleEstadoChange(usuario_id, estadoActual) {
       showCancelButton: true,
       confirmButtonText: 'Sí, cambiarlo',
       cancelButtonText: 'No, cancelar',
-      confirmButtonColor: '#19727A',  
-      cancelButtonColor: '#A72307',  
+      confirmButtonColor: '#19727A',
+      cancelButtonColor: '#A72307',
     });
 
     if (result.isConfirmed) {
-      // Si confirma el cambio, realizar la solicitud AJAX
-      cambiarEstadoUsuario(usuario_id, nuevoEstado);
+      // Si confirma el cambio, realizar la solicitud para cambiar el estado
+      await cambiarEstadoUsuario(usuario_id, nuevoEstado);
     }
   } else {
     // Si SweetAlert2 no está disponible, usar confirm() de JS
     const confirmacion = confirm(`¿Estás seguro de cambiar el estado del usuario a ${nuevoEstado === 2 ? 'ACTIVO' : 'INACTIVO'}?`);
     if (confirmacion) {
-      cambiarEstadoUsuario(usuario_id, nuevoEstado);
+      await cambiarEstadoUsuario(usuario_id, nuevoEstado);
     }
   }
 }
 
 // Función para cambiar el estado del usuario
-function cambiarEstadoUsuario(usuario_id, nuevoEstado) {
-  $.ajax({
-    url: 'updateState.php',
-    type: 'POST',
-    data: {
-      usuario_id: usuario_id,
-      estado: nuevoEstado
-    },
-    success: function(response) {
-      const data = JSON.parse(response);
-      
-      // Mostrar la alerta de éxito o error
-      if (data.success) {
-        mostrarAlertaEstado('Estado actualizado', data.message, 'success');
-      } else {
-        mostrarAlertaEstado('Error', data.message, 'error');
-      }
+async function cambiarEstadoUsuario(usuario_id, nuevoEstado) {
+  try {
+    // Realizar la solicitud usando fetch
+    const response = await fetch('updateState.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        usuario_id: usuario_id,
+        estado: nuevoEstado,
+      }),
+    });
 
-      
-      if (typeof cargarUsuariosInactivos === 'function') {
-        // Si la función existe, se ejecuta
-        cargarUsuariosInactivos(sedeSeleccionadaInactivos, page, limitinactivos);
-      }
-      
-      if (typeof cargarUsuarios === 'function') {
-        // Si la función existe, se ejecuta
-        cargarUsuarios($("#filtroSedes").val(), page, limit);
-      }
-    
-    },
-    error: function(jqXHR, textStatus, errorThrown) {
-      console.error('Error AJAX:', textStatus, errorThrown);
-      mostrarAlertaEstado('Error', 'Hubo un problema con la solicitud AJAX.', 'error');
+    const data = await response.json(); // Parseamos la respuesta como JSON
+
+    // Mostrar la alerta de éxito o error
+    if (data.success) {
+      mostrarAlertaEstado('Estado actualizado', data.message, 'success');
+    } else {
+      mostrarAlertaEstado('Error', data.message, 'error');
     }
-  });
+
+    // Cargar usuarios inactivos si la función existe
+    if (typeof cargarUsuariosInactivos === 'function') {
+      cargarUsuariosInactivos(sedeSeleccionadaInactivos, page, limitinactivos);
+    }
+
+    // Cargar usuarios activos si la función existe
+    if (typeof cargarUsuarios === 'function') {
+      cargarUsuarios($("#filtroSedes").val(), page, limit);
+    }
+
+  } catch (error) {
+    console.error('Error en la solicitud:', error);
+    mostrarAlertaEstado('Error', 'Hubo un problema con la solicitud AJAX.', 'error');
+  }
 }

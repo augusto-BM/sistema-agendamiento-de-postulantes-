@@ -1,4 +1,4 @@
-//console.log("SCRIPT: Se cargó el script de AJAX para generar el calendario."); 
+console.log("SCRIPT: Se cargó el script de AJAX para generar el calendario."); 
 
 // Declaración de variables globales
 /* const  */ fechaActual = new Date();

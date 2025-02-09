@@ -254,13 +254,104 @@ require_once '../../../config/datossesion/datossesion.php'
     });
 </script>
 
+<!-- SCRIPT AJAX VALIDAR INPUT FECHA DE AGENDA LABORABLE -->
 <script>
+    console.log("Cargando el script validarFechaAgenda.js");
+
+    $(document).ready(async function () {
+        let fechaAsignada;  // Variable para almacenar la fecha asignada inicialmente
+
+        try {
+            // Realizar una solicitud AJAX para cargar el archivo fechasCalendario.json
+            const fechasNoLaborables = await obtenerFechasNoLaborables();
+
+            // Obtener la fecha de Lima
+            const fechaLima = obtenerFechaLima();
+            let manana = new Date(fechaLima);
+            manana.setDate(fechaLima.getDate() + 1);
+            const mananaStr = formatearFecha(manana); // Fecha de mañana en formato 'YYYY-MM-DD'
+
+            // Crear un Set para las fechas no laborables
+            const fechasNoLaborablesSet = new Set(
+                fechasNoLaborables.map(function (fecha) {
+                    return formatearFecha(new Date(fecha.year, fecha.month - 1, fecha.day));
+                })
+            );
+
+            // Verificar si la fecha de mañana está en el Set de fechas no laborables
+            if (!fechasNoLaborablesSet.has(mananaStr)) {
+                fechaAsignada = mananaStr;  // Guardar la fecha asignada
+                $("#fecha_agenda").val(mananaStr);
+            } else {
+                const siguienteLaborable = getSiguienteLaborable(manana, fechasNoLaborablesSet);
+                const siguienteLaborableStr = formatearFecha(siguienteLaborable);
+                fechaAsignada = siguienteLaborableStr;  // Guardar la fecha asignada
+                $("#fecha_agenda").val(siguienteLaborableStr);
+            }
+
+            // Establecer la fecha mínima del input
+            $("#fecha_agenda").attr("min", mananaStr);
+
+            // Validación al cambiar la fecha
+            $("#fecha_agenda").on('change', function () {
+                const selectedDate = new Date($(this).val());
+                const selectedDateStr = formatearFecha(selectedDate);
+
+                // Comprobar si la fecha seleccionada es un domingo o una fecha no laborable
+                if (selectedDate.getDay() === 0) { // 0 = Domingo
+                    alert("No se puede seleccionar un domingo. Por favor, elige otro día.");
+                    $(this).val(fechaAsignada); // Recuperar la fecha laborable previamente asignada
+                } else if (fechasNoLaborablesSet.has(selectedDateStr)) {
+                    alert("El día seleccionado es no laborable. Por favor, elige otro día.");
+                    $(this).val(fechaAsignada); // Recuperar la fecha laborable previamente asignada
+                }
+            });
+
+        } catch (error) {
+            console.error("Error al cargar las fechas no laborables:", error);
+        }
+
+        // Función asíncrona para obtener las fechas no laborables
+        async function obtenerFechasNoLaborables() {
+            try {
+                const response = await $.ajax({
+                    url: "../calendario/fechasCalendario.json", // Ruta al archivo JSON
+                    type: "GET",
+                    dataType: "json"
+                });
+                return response;  // Devuelve las fechas no laborables
+            } catch (error) {
+                throw new Error("Error al cargar las fechas no laborables: " + error);
+            }
+        }
+
+        // Función para obtener el siguiente día laborable
+        function getSiguienteLaborable(fechaInicio, fechasNoLaborablesSet) {
+            let siguienteFecha = new Date(fechaInicio);
+            while (true) {
+                siguienteFecha.setDate(siguienteFecha.getDate() + 1);
+                const siguienteFechaStr = formatearFecha(siguienteFecha);
+
+                // Comprobar si la siguiente fecha no está en el Set y no es domingo
+                if (!fechasNoLaborablesSet.has(siguienteFechaStr) && siguienteFecha.getDay() !== 0) {
+                    return siguienteFecha;
+                }
+            }
+        }
+    });
+</script>
+
+
+
+
+<!-- SCRIPT PARA VALIDAR EL INPUT DE AGENDAR FECHA -->
+<!-- <script>
     // Guardamos el valor inicial del campo de fecha
-    const fechaInput = document.getElementById('fecha_agenda');
-    let initialValue = fechaInput.value;
+    const fechaInputAgenda = document.getElementById('fecha_agenda');
+    let initialValue = fechaInputAgenda.value;
 
     // Escuchar cuando el valor del campo cambia
-    fechaInput.addEventListener('change', function(event) {
+    fechaInputAgenda.addEventListener('change', function(event) {
         // Mostrar el valor seleccionado para verificar la entrada
         console.log("Fecha seleccionada: ", event.target.value);
 
@@ -289,12 +380,7 @@ require_once '../../../config/datossesion/datossesion.php'
     });
 
     // Para manejar el caso de que el valor inicial se modifique fuera del evento (por ejemplo, con un valor predeterminado)
-    fechaInput.addEventListener('focus', function() {
-        initialValue = fechaInput.value;
+    fechaInputAgenda.addEventListener('focus', function() {
+        initialValue = fechaInputAgenda.value;
     });
-</script>
-
-<!-- REGISTAR USUARIO MEDIANTE AJAX -->
-<script src="../../../public/js/agenda/validarFechaAgenda.js"></script>
-<!-- 
-<script src="../../../public/js/usuarios/ajaxRegistrarUsuario.js"></script> -->
+</script> -->
