@@ -11,4 +11,4 @@
     </div>
 </div>
 
-<script src="../../../public/js/calendario/ajaxGenerarCalendario.js"></script>
+<script src="../../../public/js/calendario/ajaxCalendario.js"></script>

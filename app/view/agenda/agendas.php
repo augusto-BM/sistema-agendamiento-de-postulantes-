@@ -1,7 +1,7 @@
 <?php
 /* **** CONFIGURAR CONSTANTES OBLIGATORIAS EN TODAS LAS PAGINAS DINAMICO **** */
 //titulo de la pagina
-define('TITULO', 'Agendas');
+define('TITULO', 'Agenda');
 
 //nombre de carpeta de la SECCION que pertence
 define('SECCION', 'agenda');
@@ -50,8 +50,16 @@ if (isset($_SESSION['activo'])) {
                         <div class="content-wrapper">
                             <div class="container-xxl flex-grow-1 container-p-y contenedor-secundario">
                                 <h4 class="fw-bold py-3 mb-1"><span class="text-muted fw-light">Agenda /</span>
-                                    Agendas</h4>
+                                    Agendas                                     <!-- Botón para añadir usuario -->
+                                    <button type="button" class="btn btn-primary abrirModal"
+                                        style="background-color: #19727A; color: white; border: 0px; margin-left: 20px;"
+                                        data-id="registrarAgenda" data-prefix="Agenda/"
+                                        data-titulo="Agendar Postulante">
+                                        Registar <i class="fa-solid fa-plus"></i>
+                                    </button></h4>
+                                    
                                 <?php
+                                require_once '../components/modalDinamico.php'; 
                                 require_once '../../controller/sedes/sedesController.php';
                                 require_once '../../controller/usuarios/usuariosController.php';
 
@@ -61,7 +69,7 @@ if (isset($_SESSION['activo'])) {
                                 $obj2 = new usuariosController();
                                 $reclutadores = $obj2->listarReclutadores();
                                 ?>
-                                <div class="row mt-2 filtradoFecha">
+                                <div class="row filtradoFecha">
                                     <!-- SELECT PARA FILTRAR LAS SEDES -->
                                     <div class="col-md-3">
                                         <label class="form-label" for="filtroSedes">Sede</label>
@@ -107,10 +115,10 @@ if (isset($_SESSION['activo'])) {
                                         <label class="form-label" for="filtroFecha">Selecciona filtro:</label>
                                         <select class="form-control" id="filtroFecha">
                                             <option style="display: none;" value="" disabled>Fecha Personalizada</option>
-                                            <option value="hoy" selected>Hoy</option>
+                                            <option value="hoy">Hoy</option>
                                             <option value="ayer">Ayer</option>
                                             <option value="semana">Ultimos 7 dias</option>
-                                            <option value="mes">Ultimo mes</option>
+                                            <option value="mes" selected>Ultimo mes</option>
                                             <option value="tresMeses">Ultimos 3 meses</option>
                                             <option value="seisMeses">Ultimos 6 meses</option>
                                             <option value="doceMeses">Ultimos 12 meses</option>
@@ -133,8 +141,7 @@ if (isset($_SESSION['activo'])) {
                                             </div>
                                             <div class="col-md-4 d-flex flex-column justify-content-end">
                                                 <div class="fecha_col">
-                                                    <button id="btnBuscarUsuario" class="btn btn-primary btn_buscar">Buscar</button>
-                                                    <button id="btnBuscarAdmin" class="btn btn-primary btn_buscar">Buscar</button>
+                                                    <button id="btnBuscarAgenda" class="btn btn-primary btn_buscar">Buscar</button>
                                                 </div>
                                             </div>
                                         </div>

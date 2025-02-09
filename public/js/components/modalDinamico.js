@@ -1,25 +1,60 @@
+//console.log("modal dinámico cargado");
 $(document).on('click', '.abrirModal', function(event) {
     event.preventDefault();
-    //console.log("Botón de modal clickeado");
+    console.log("Botón de modal clickeado");
 
-    var modalId = $(this).data('id');   //Este es el nombre del archivo donde esta el contenido del modal
-    var prefix = $(this).data('prefix'); 
+    // Obtener los datos del botón
+    var modalId = $(this).data('id');   // Este es el nombre del archivo donde está el contenido del modal
+    var prefix = $(this).data('prefix');
     var modalTitle = $(this).data('titulo');
-    
-    //SOLO LOS QUE TIENE EL VALOR DEL ID EN EL BOTON
-    var identificador = $(this).data('identificador'); 
-    //console.log(identificador);
+    var identificador = $(this).data('identificador');  // Datos adicionales si son necesarios
 
+    // Actualizar el título del modal dinámicamente
     $('#modalDinamicoLabel').html('<span class="fw-light">' + prefix + '</span> ' + modalTitle);
 
-    //SOLO SI EXISTE EL ID DINAMICO SE ENVIA EL VALOR SINO SOLO QUEDA VACIO
+    // Condicionar el estilo del modal según el tipo de contenido
+    if (modalId === "calendario") {
+        // Para el calendario, podemos ajustar la altura y los estilos
+        $('#modalDinamico .modal-dialog').removeClass('modal-xl')/* .addClass('modal-lg') */;
+        $('#modalDinamico .modal-body').css({
+            'display': 'flex',
+            'justify-content': 'center',
+            'align-items': 'flex-start',
+            'height': '100%',
+            'overflow-y': 'auto',
+            'padding': '0'
+        });
+        $('#modalDinamico .modal-content').css({
+            'height': '500px',
+        });
+        /* $('#modalDinamicoLabel').text('Calendario'); */
+    } else {
+        // Para otros modales, asegurarse de usar la clase de tamaño grande
+        $('#modalDinamico .modal-dialog').removeClass('modal-lg').addClass('modal-xl');
+        $('#modalDinamico .modal-body').removeAttr('style');
+    }
+
+    // Definir la URL según el tipo de contenido a cargar
+    var url;
+    if (modalId === "calendario") {
+        url = "../calendario/" + modalId + ".php";  // Ruta para el calendario
+    } else {
+        url = modalId + ".php";  // Ruta genérica para otros modales
+    }
+
+    // Datos adicionales que se enviarán si el identificador existe
     var dataToSend = identificador ? { identificador: identificador } : {};
+
+    // Hacer la petición Ajax para cargar el contenido en el modal dinámico
     $.ajax({
-        url: modalId + '.php',
+        url: url,  // Usar la URL definida arriba
         type: 'GET',
         data: dataToSend,
         success: function(response) {
+            // Cargar el contenido recibido en el cuerpo del modal
             $('#modalDinamico .modal-body').html(response);
+
+            // Mostrar el modal dinámicamente
             var myModal = new bootstrap.Modal(document.getElementById('modalDinamico'));
             myModal.show();
         },
@@ -29,37 +64,13 @@ $(document).on('click', '.abrirModal', function(event) {
     });
 });
 
-// Aquí agregamos el evento para limpiar el contenido del modal cuando se cierra
+// Limpiar el contenido del modal cuando se cierre
 $('#modalDinamico').on('hidden.bs.modal', function() {
-    // Limpiar el contenido de la modal para liberar recursos
-    $('#modalDinamico .modal-body').empty();
+    $('#modalDinamico .modal-body').empty();  // Vaciar el contenido para liberar recursos
+
+    // Restaurar los estilos predeterminados del modal después de cerrarlo
+    $('#modalDinamico .modal-dialog')/* .removeClass('modal-lg') */.addClass('modal-xl');
+    $('#modalDinamico .modal-body').removeAttr('style');
+    $('#modalDinamico .modal-content').removeAttr('style');
+    $('#modalDinamicoLabel').text('Título del Modal');
 });
-
-/* $(document).ready(function() {
-    // Cuando el usuario hace clic en cualquier botón con la clase 'abrirModal'
-    $('.abrirModal').on('click', function() {
-        // Obtener el ID, el título y el prefijo desde los atributos 'data-id', 'data-titulo' y 'data-prefix' del botón
-        var modalId = $(this).data('id');
-        var prefix = $(this).data('prefix');
-        var modalTitle = $(this).data('titulo');
-
-        // Actualizar el título del modal con el prefijo dinámico y el título
-        $('#modalDinamicoLabel').html('<span class="fw-light">' + prefix + '</span> ' + modalTitle);
-
-        // Hacer la petición Ajax con el modalId para cargar el contenido correspondiente
-        $.ajax({
-            url: modalId + '.php',
-            type: 'GET',
-            success: function(response) {
-                // Cargar el contenido recibido en el cuerpo del modal
-                $('#modalDinamico .modal-body').html(response);
-
-                // Mostrar el modal automáticamente
-                $('#modalDinamico').modal('show');
-            },
-            error: function() {
-                alert('Hubo un error al cargar el contenido.');
-            }
-        });
-    });
-}); */

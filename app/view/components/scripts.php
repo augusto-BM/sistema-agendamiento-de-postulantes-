@@ -15,8 +15,8 @@
         }
     }
 
-    // Bucle de archivos JS de componentes
-    cargarArchivosJs(ARCHIVOS_JS, "../../../public/js/components");
+/*     // Bucle de archivos JS de componentes
+    cargarArchivosJs(ARCHIVOS_JS, "../../../public/js/components"); */
 
     // Bucle de archivos JS según sección(Nombre de la carpeta)
     cargarArchivosJs(ARCHIVOS_JS, "../../../public/js/" . SECCION);
@@ -24,5 +24,4 @@
     
 
 ?>
-<script src="../../../public/js/calendario/modalCalendario.js"></script>
 <script src="../../../public/js/components/modalDinamico.js"></script>

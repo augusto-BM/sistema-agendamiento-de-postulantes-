@@ -95,10 +95,10 @@ $(document).ready(function () {
     $("#btnBuscarFecha").hide();
     filtrarAsistencias();
   });
-  
+
   // Establecer la fecha de hoy como valor predeterminado al cargar la página
-  var hoy = obtenerFechaLima();
-  $("#fechaInicio").val(formatearFecha(hoy));
-  $("#fechaFin").val(formatearFecha(hoy));
-  $("#filtroFecha").val("hoy");
+  var mes = obtenerFechaLima();
+  mes.setMonth(mes.getMonth() - 1);
+  $("#fechaInicio").val(formatearFecha(mes));
+  $("#fechaFin").val(formatearFecha(obtenerFechaLima()));
 });

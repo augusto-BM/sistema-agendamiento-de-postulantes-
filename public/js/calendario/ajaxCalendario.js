@@ -1,9 +1,10 @@
+//console.log("SCRIPT: Se cargó el script de AJAX para generar el calendario."); 
+
 // Declaración de variables globales
 /* const  */ fechaActual = new Date();
 /* let  */ diaSeleccionado = null;
 /* const  */ dias = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 /* const  */ meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-  
   // Función auxiliar para obtener la fecha de hoy (con hora normalizada a 00:00:00)
   function obtenerDiaHoy() {
     const today = new Date();
@@ -43,7 +44,7 @@
     const year = fechaActual.getFullYear();
     const month = fechaActual.getMonth();
   
-    // Asegurarse de que fechaActual esté en el primer día del mes
+    // Asegúrate de que fechaActual esté en el primer día del mes
     fechaActual.setFullYear(year, month, 1);
   
     const firstDayOfMonth = new Date(year, month, 1);
@@ -67,12 +68,14 @@
   
     // Solicita el JSON con las fechas guardadas
     $.ajax({
-      url: "../calendario/fechas.json",
+      url: "../calendario/fechasCalendario.json",
       type: "GET",
       dataType: "json",
       success: function (response) {
         // Filtra para obtener solo los domingos del mes actual
         const savedDates = limpiarDomingosPasadosEsteMes(response);
+
+        //console.log("Fechas cargadas:", savedDates);
   
         // Recorre todos los días del mes
         for (let i = 1; i <= daysInMonth; i++) {
@@ -157,6 +160,7 @@
       $("#prev-month").prop("disabled", false).removeClass("disabled-prev-month");
     }
   }
+  
   
   function cambiarMes(increment) {
     let newMonth = fechaActual.getMonth() + increment;
@@ -247,7 +251,7 @@
   
   function removerDiasPasadosDeHoy() {
     $.ajax({
-      url: "../calendario/fechas.json",
+      url: "../calendario/fechasCalendario.json",
       type: "GET",
       dataType: "json",
       success: function (response) {
@@ -284,7 +288,7 @@
   function validarCalendario() {
     return new Promise((resolve, reject) => {
       $.ajax({
-        url: "../calendario/fechas.json",
+        url: "../calendario/fechasCalendario.json",
         type: "GET",
         dataType: "json",
         success: function (response) {

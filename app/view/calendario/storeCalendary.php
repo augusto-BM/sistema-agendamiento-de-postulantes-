@@ -17,7 +17,7 @@ $data = file_get_contents("php://input");
 $requestData = json_decode($data, true);
 
 // Ruta al archivo JSON donde se guardan las fechas
-$filePath = 'fechas.json';
+$filePath = 'fechasCalendario.json';
 
 // Leer el contenido actual del archivo (si existe)
 $existingData = [];
