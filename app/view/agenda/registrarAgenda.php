@@ -253,12 +253,6 @@ require_once '../../../config/datossesion/datossesion.php'
         document.getElementById('nombre_sede').value = nombreSede;
     });
 </script>
-<div class="col-md-3">
-    <label for="fecha_agenda" class="form-label">FECHA DE AGENDA <span class="asterisco" title="Campo obligatorio">*</span></label>
-    <input type="date" id="fecha_agenda" name="fecha_agenda" class="form-control" value=""
-           min="<?php echo date('Y-m-d', strtotime('+1 day')); ?>">
-    <div class="invalid-feedback">Este campo es obligatorio.</div>
-</div>
 
 <script>
     // Guardamos el valor inicial del campo de fecha
