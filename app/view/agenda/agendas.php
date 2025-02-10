@@ -73,6 +73,8 @@ if (isset($_SESSION['activo'])) {
                                 $displayCompleto = $soloRolPermitido ? '' : 'display: none;';
                                 $idBtnAcceso = $soloRolPermitido ? 'btn_filtroCompleto' : 'btn_filtroRestringido';
                                 ?>
+                                <input type="hidden" id="idrolSesion" value="<?= $idrol; ?>" name="idrolSesion">
+                                <input type="hidden" id="nombreUsuarioSesion" value="<?= $nombreusuario; ?>" name="nombreUsuarioSesion">
                                 <div class="row filtradoFecha" style="<?= $displayCompleto; ?>">
                                     <!-- SELECT PARA FILTRAR LAS SEDES -->
                                     <div class="col-md-3">
@@ -81,7 +83,7 @@ if (isset($_SESSION['activo'])) {
                                             <option value="TODOS" selected>TODOS</option>
                                             <?php if ($sedes): ?>
                                                 <?php foreach ($sedes as $sede): ?>
-                                                    <option value="<?= $sede->idsede; ?>"><?= $sede->nombresede; ?></option>
+                                                    <option value="<?= $sede->nombresede; ?>"><?= $sede->nombresede; ?></option>
                                                 <?php endforeach; ?>
                                             <?php else: ?>
                                                 <option value="" disabled>No hay sedes disponibles</option>
@@ -89,8 +91,8 @@ if (isset($_SESSION['activo'])) {
                                         </select>
                                     </div>
                                     <div class="col-md-3">
-                                        <label class="form-label" for="filtroSedes">Estado</label>
-                                        <select class="form-control" id="filtroSedes">
+                                        <label class="form-label" for="filtroEstado">Estado</label>
+                                        <select class="form-control" id="filtroEstado">
                                             <option value="TODOS" selected>TODOS</option>
                                             <option value="AGENDADO">AGENDADO</option>
                                             <option value="NO RESPONDE">NO RESPONDE</option>
@@ -99,12 +101,12 @@ if (isset($_SESSION['activo'])) {
                                         </select>
                                     </div>
                                     <div class="col-md-3">
-                                        <label class="form-label" for="filtroSedes">Reclutador</label>
-                                        <select class="form-control" id="filtroSedes">
+                                        <label class="form-label" for="filtroRecultador">Reclutador</label>
+                                        <select class="form-control" id="filtroRecultador">
                                             <option value="TODOS" selected>TODOS</option>
                                             <?php if ($reclutadores): ?>
                                                 <?php foreach ($reclutadores as $reclutador): ?>
-                                                    <option value="<?= $reclutador->idusuario; ?>"><?= $reclutador->nombreusuario; ?></option>
+                                                    <option value="<?= $reclutador->nombreusuario; ?>"><?= $reclutador->nombreusuario; ?></option>
                                                 <?php endforeach; ?>
                                             <?php else: ?>
                                                 <option value="" disabled>No hay reclutadores disponibles</option>
@@ -176,23 +178,28 @@ if (isset($_SESSION['activo'])) {
                             </div>
 
                             <p class="text-center">
-                                <i id="resultadoCount">Se encontró 0 resultados <span id="busquedaRealizadaUsuarios"></span>
+                                <i id="resultadoCountAgenda">Se encontró 0 resultados <span id="busquedaRealizadaAgendas"></span>
                                 </i>
                             </p>
 
                             <div class="table-responsive col-sm-12 col-md-12 col-lg-12 col-xl-12">
-                                <table class="table table-borderless table-hover w-100 tabla-general" id="myTablaUsuarios">
+                                <table class="table table-borderless table-hover w-100 tabla-general" id="myTablaAgendas">
                                     <thead class="table-light">
                                         <tr>
                                             <th style="display: none;">id</th>
                                             <th class="text-center">#</th>
-                                            <th>COLABORADOR</th>
-                                            <th>DNI</th>
-                                            <th style="display: none;">CORREO</th>
-                                            <th>CELULAR</th>
-                                            <th>SEDE</th>
-                                            <th>FECHA DE INGRESO</th>
+                                            <th>FECHA REGISTRO</th>
+                                            <th>POSTULANTE</th>
+                                            <th>DOC</th>
+                                            <th>N° DOC.</th>
+                                            <th>EDAD</th>
+                                            <th>TELEFONO</th>
+                                            <th>DISTRITO</th>
+                                            <th>FUENTE</th>
+                                            <th>CONTACTO</th>
                                             <th>ESTADO</th>
+                                            <th>DETALLE</th>
+                                            <th>FECHA AGENDA</th>
                                             <th></th>
                                         </tr>
                                     </thead>
@@ -209,9 +216,8 @@ if (isset($_SESSION['activo'])) {
                         <?php file_exists(RUTA_FOOTER) ? require_once RUTA_FOOTER : print "Error: No se pudo incluir el archivo de encabezado."; ?>
                         <!-- FINALIZA FOOTER -->
                     </div>
-        </div>
-        </section>
-        </main>
+                </section>
+            </main>
         </div>
         <?php require_once '../components/alertaSesion.php' ?>
 

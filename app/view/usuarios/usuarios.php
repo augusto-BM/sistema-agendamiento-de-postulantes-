@@ -89,9 +89,6 @@ if (isset($_SESSION['activo'])) {
                                         Usuarios Desactivados <i class="fa-solid fa-user-injured"></i>
                                     </button>
                                 </div>
-
-                                
-
                             </div>
                         </div>
                         <br>

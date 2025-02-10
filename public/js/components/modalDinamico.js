@@ -65,6 +65,24 @@ $(document).on("click", ".abrirModal", function (event) {
         document.getElementById("modalDinamico")
       );
       myModal.show();
+
+      // Si el modal es de calendario, espera a que esté completamente visible para renderizarlo
+      if (modalId === "calendario") {
+        $("#modalDinamico").off("shown.bs.modal").on("shown.bs.modal", function () {
+          if (typeof renderizarCalendario === "function") {
+            console.log("Renderizando calendario1...");
+            renderizarCalendario();
+          }
+        });
+      }
+/*         if (modalId === "calendario") {
+          $("#modalDinamico").one("shown.bs.modal", function () {
+            if (typeof renderizarCalendario === "function") {
+              console.log("Renderizando calendario3...");
+              renderizarCalendario();
+            }
+          });
+        } */
     },
     error: function () {
       alert("Hubo un error al cargar el contenido.");
@@ -75,6 +93,8 @@ $(document).on("click", ".abrirModal", function (event) {
 // Limpiar el contenido del modal cuando se cierre
 $("#modalDinamico").on("hidden.bs.modal", function () {
   if (typeof renderizarCalendario === "function") {
+    console.log("Renderizando calendario123...");
+    renderizarCalendario();
     renderizarCalendario();
   }
   //console.log("Modal cerrado");

@@ -12,152 +12,159 @@
 </div>
 
 <script>
-    // Declaración de variables globales
-    /* const  */fechaActual = new Date();
-    /* let  */diaSeleccionado = null;
-    /* const  */dias = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
-    /* const  */meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    console.log("SCRIPT: Se cargó el script de AJAX para generar el calendariosada .");
 
-    // Función auxiliar para obtener la fecha de hoy (con hora normalizada a 00:00:00)
-    function obtenerDiaHoy() {
+    /*** VARIABLES GLOBALES ***/
+    /* const */
+    fechaActualCalendario = new Date();
+    /* let  */
+    diaSeleccionadoCalendario = null;
+    /* const */
+    diasCalendario = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+    /*  const  */
+    mesesCalendario = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+    /*** FUNCIONES DE AYUDA ***/
+    // Devuelve la fecha de hoy con la hora normalizada a 00:00:00
+    function obtenerDiaHoyCalendario() {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         return today;
     }
 
-    // Función para obtener las fechas guardadas del calendario
-    async function obtenerFechasGuardadas() {
-        try {
-            const response = await $.ajax({
-                url: "../calendario/fechasCalendario.json",
-                type: "GET",
-                dataType: "json"
-            });
-            return response;
-        } catch (error) {
-            console.error("Error al obtener las fechas guardadas:", error);
-            return [];
-        }
+    /*** MÓDULO DE ACCESO AL BACKEND ***/
+    // Función genérica para enviar datos al backend
+    function updateCalendarData(data) {
+        return $.ajax({
+            url: "../calendario/storeCalendary.php",
+            type: "POST",
+            data: JSON.stringify(data),
+            contentType: "application/json"
+        });
     }
 
-    // Función para limpiar los domingos pasados del mes actual
-    async function limpiarDomingosPasadosEsteMes(savedDates) {
-        const currentYear = fechaActual.getFullYear();
-        const currentMonth = fechaActual.getMonth(); // 0 a 11
-
-        const validSundays = savedDates.filter(
-            (date) => date.year === currentYear && date.month === currentMonth + 1
-        );
-
-        if (validSundays.length > 0) {
-            try {
-                await $.ajax({
-                    url: "../calendario/storeCalendary.php",
-                    type: "POST",
-                    data: JSON.stringify({
-                        sundays: validSundays
-                    }),
-                    contentType: "application/json"
-                });
-                //console.log("Fechas actualizadas correctamente");
-            } catch (error) {
-                console.error("Hubo un error al actualizar las fechas:", error);
-            }
-        }
-
-        return validSundays;
+    // Función para obtener el JSON con las fechas guardadas
+    function fetchStoredDatesCalendario() {
+        return $.ajax({
+            url: "../calendario/fechasCalendario.json",
+            type: "GET",
+            dataType: "json"
+        });
     }
 
-    // Función para renderizar el calendario
+    /*** MÓDULO DE RENDERIZADO DEL CALENDARIO ***/
     function renderizarCalendario() {
-        const yearMonth = $("#calendar-year-month");
-        const calendarDays = $("#calendar-days");
+        const $yearMonth = $("#calendar-year-month");
+        const $calendarDays = $("#calendar-days");
 
-        const year = fechaActual.getFullYear();
-        const month = fechaActual.getMonth();
-
-        fechaActual.setFullYear(year, month, 1);
+        const year = fechaActualCalendario.getFullYear();
+        const month = fechaActualCalendario.getMonth();
+        // Aseguramos que fechaActualCalendario esté en el primer día del mes
+        fechaActualCalendario.setFullYear(year, month, 1);
 
         const firstDayOfMonth = new Date(year, month, 1);
         const lastDayOfMonth = new Date(year, month + 1, 0);
         const daysInMonth = lastDayOfMonth.getDate();
 
-        yearMonth.text(`${meses[month]} ${year}`);
+        // Actualiza el encabezado del calendario
+        $yearMonth.text(`${mesesCalendario[month]} ${year}`);
+        $calendarDays.empty();
 
-        calendarDays.empty();
+        // Cabecera con los días de la semana
+        diasCalendario.forEach(day => $calendarDays.append(`<div>${day}</div>`));
 
-        dias.forEach((day) => calendarDays.append(`<div>${day}</div>`));
-
+        // Espacios vacíos para alinear el primer día
         const firstDayWeekday = firstDayOfMonth.getDay();
         for (let i = 0; i < firstDayWeekday; i++) {
-            calendarDays.append("<div></div>");
+            $calendarDays.append("<div></div>");
         }
 
-        obtenerFechasGuardadas().then(async (savedDates) => {
-            const validSundays = await limpiarDomingosPasadosEsteMes(savedDates);
+        // Se obtienen las fechas guardadas y se renderizan los días
+        fetchStoredDatesCalendario()
+            .done(function(response) {
+                // Se filtran los domingos correspondientes al mes actual y se actualiza el backend
+                const savedDatesCalendario = limpiarDomingosPasadosEsteMes(response);
 
-            for (let i = 1; i <= daysInMonth; i++) {
-                const date = new Date(year, month, i);
-                const dayElement = $(`<div class="calendar-day">${i}</div>`);
+                for (let i = 1; i <= daysInMonth; i++) {
+                    const date = new Date(year, month, i);
+                    const $dayElement = $(`<div class="calendar-day">${i}</div>`);
 
-                if (date.toDateString() === obtenerDiaHoy().toDateString()) {
-                    dayElement.addClass("today");
-                }
+                    // Si es el día de hoy
+                    if (date.toDateString() === obtenerDiaHoyCalendario().toDateString()) {
+                        $dayElement.addClass("today");
+                    }
 
-                const dateExists = validSundays.some(
-                    (savedDate) =>
-                    savedDate.year === year &&
-                    savedDate.month === month + 1 &&
-                    savedDate.day === i
-                );
-                if (dateExists) {
-                    dayElement.addClass("red");
-                }
+                    // Si la fecha ya está guardada en el backend, se pinta de color (por ejemplo, rojo)
+                    const dateExists = savedDatesCalendario.some(savedDate =>
+                        savedDate.year === year &&
+                        savedDate.month === month + 1 &&
+                        savedDate.day === i
+                    );
+                    if (dateExists) {
+                        $dayElement.addClass("red");
+                    }
 
-                if (date < obtenerDiaHoy()) {
-                    dayElement.addClass("disabled");
-                } else if (date.getDay() === 0) {
-                    dayElement.addClass("red disabled");
-                } else {
-                    dayElement.on("click", function() {
-                        diaSeleccionado = dayElement;
-                        const isSelected = dayElement.hasClass("red");
-                        const diaSeleccionadoInfo = {
-                            year: date.getFullYear(),
-                            month: date.getMonth() + 1,
-                            day: date.getDate(),
-                        };
+                    // Días anteriores a hoy se deshabilitan
+                    if (date < obtenerDiaHoyCalendario()) {
+                        $dayElement.addClass("disabled");
+                    }
+                    // Los domingos se deshabilitan y se marcan (para evitar selección)
+                    else if (date.getDay() === 0) {
+                        $dayElement.addClass("red disabled");
+                    }
+                    // Para días habilitados se asigna el evento click
+                    else {
+                        $dayElement.on("click", function() {
+                            diaSeleccionadoCalendario = $dayElement;
+                            const diaSeleccionadoInfo = {
+                                year: date.getFullYear(),
+                                month: date.getMonth() + 1,
+                                day: date.getDate()
+                            };
 
-                        if (isSelected) {
-                            dayElement.removeClass("red");
-                        } else {
-                            dayElement.addClass("red");
-                        }
+                            // Se determina el estado actual (seleccionado o no)
+                            const isSelected = $dayElement.hasClass("red");
 
-                        $.ajax({
-                            url: "../calendario/storeCalendary.php",
-                            type: "POST",
-                            data: JSON.stringify(diaSeleccionadoInfo),
-                            contentType: "application/json",
-                            success: function(response) {
-                                //console.log("Fecha actualizada:", response);
-                            },
-                            error: function(xhr, status, error) {
-                                console.error("Hubo un error al guardar la fecha:", error);
-                            },
+                            // Se envía la información al backend y, solo si la respuesta es exitosa, se aplica el cambio visual
+                            updateCalendarData(diaSeleccionadoInfo)
+                                .done(function(response) {
+                                    if (isSelected) {
+                                        $dayElement.removeClass("red");
+                                    } else {
+                                        $dayElement.addClass("red");
+                                    }
+                                })
+                                .fail(function(xhr, status, error) {
+                                    console.error("Error al guardar la fecha:", error);
+                                });
                         });
-                    });
-                }
+                    }
 
-                calendarDays.append(dayElement);
-            }
-        }).catch(error => console.error("Error al obtener las fechas guardadas:", error));
+                    // Se añade el día al contenedor del calendario
+                    $calendarDays.append($dayElement);
+                }
+            })
+            .fail(function(xhr, status, error) {
+                console.error("Error al obtener las fechas guardadas:", error);
+            });
+
+        // Se deshabilita el botón de mes anterior si se está mostrando el mes actual
+        const today = obtenerDiaHoyCalendario();
+        const currentCalendar = new Date(year, month, 1);
+        if (
+            today.getFullYear() === currentCalendar.getFullYear() &&
+            today.getMonth() === currentCalendar.getMonth()
+        ) {
+            $("#prev-month").prop("disabled", true).addClass("disabled-prev-month");
+        } else {
+            $("#prev-month").prop("disabled", false).removeClass("disabled-prev-month");
+        }
     }
 
-    // Función para cambiar de mes
+    // Función para cambiar de mes y renderizar nuevamente
     function cambiarMes(increment) {
-        let newMonth = fechaActual.getMonth() + increment;
-        let newYear = fechaActual.getFullYear();
+        let newMonth = fechaActualCalendario.getMonth() + increment;
+        let newYear = fechaActualCalendario.getFullYear();
 
         if (newMonth < 0) {
             newMonth = 11;
@@ -167,150 +174,165 @@
             newYear++;
         }
 
-        fechaActual.setFullYear(newYear);
-        fechaActual.setMonth(newMonth);
-        fechaActual.setDate(1);
+        fechaActualCalendario.setFullYear(newYear);
+        fechaActualCalendario.setMonth(newMonth);
+        fechaActualCalendario.setDate(1);
         renderizarCalendario();
     }
 
-    // Función para obtener los domingos de un mes
+    /*** MÓDULO PARA MANEJAR LOS DOMINGOS ***/
+    // Función que obtiene los domingos de un mes
     function obtenerDomingos(year, month) {
         const sundays = [];
-        const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
-
-        for (let i = 1; i <= lastDayOfMonth; i++) {
+        const lastDay = new Date(year, month + 1, 0).getDate();
+        for (let i = 1; i <= lastDay; i++) {
             const date = new Date(year, month, i);
             if (date.getDay() === 0) {
                 sundays.push({
                     year: date.getFullYear(),
                     month: date.getMonth() + 1,
-                    day: date.getDate(),
+                    day: date.getDate()
                 });
             }
         }
         return sundays;
     }
 
-    // Función para guardar los domingos de este mes
-    async function domingosEsteMes() {
-        const year = fechaActual.getFullYear();
-        const month = fechaActual.getMonth();
-        let sundays = obtenerDomingos(year, month);
+    // Se filtran los domingos que corresponden al mes actual y se actualiza el backend
+    function limpiarDomingosPasadosEsteMes(savedDatesCalendario) {
+        const currentYear = fechaActualCalendario.getFullYear();
+        const currentMonth = fechaActualCalendario.getMonth();
+        const validSundays = savedDatesCalendario.filter(date =>
+            date.year === currentYear && date.month === currentMonth + 1
+        );
 
-        sundays = sundays.filter((sunday) => {
-            const sundayDate = new Date(sunday.year, sunday.month - 1, sunday.day);
-            return sundayDate >= obtenerDiaHoy();
-        });
-
-        try {
-            await $.ajax({
-                url: "../calendario/storeCalendary.php",
-                type: "POST",
-                data: JSON.stringify({
-                    sundays
-                }),
-                contentType: "application/json"
+        updateCalendarData({
+                sundays: validSundays
+            })
+            .done(function(response) {
+                // Actualización exitosa en backend.
+            })
+            .fail(function(xhr, status, error) {
+                console.error("Error al actualizar las fechas:", error);
             });
-            //console.log("Domingos guardados:", sundays);
-        } catch (error) {
-            console.error("Hubo un error al guardar los domingos:", error);
-        }
+
+        return validSundays;
     }
 
-    // Función para guardar los domingos del siguiente mes
-    async function domingosSiguenteMes() {
-        let nextMonth = fechaActual.getMonth() + 1;
-        let nextYear = fechaActual.getFullYear();
+    // Actualiza los domingos del mes actual
+    function actualizarDomingosEsteMes() {
+        const year = fechaActualCalendario.getFullYear();
+        const month = fechaActualCalendario.getMonth();
+        let sundays = obtenerDomingos(year, month);
+
+        // Se filtran para descartar domingos anteriores a hoy
+        sundays = sundays.filter(sunday => {
+            const sundayDate = new Date(sunday.year, sunday.month - 1, sunday.day);
+            return sundayDate >= obtenerDiaHoyCalendario();
+        });
+
+        updateCalendarData({
+                sundays: sundays
+            })
+            .done(function(response) {
+                // Domingos actualizados correctamente.
+            })
+            .fail(function(xhr, status, error) {
+                console.error("Error al guardar los domingos:", error);
+            });
+    }
+
+    // Actualiza los domingos del mes siguiente
+    function actualizarDomingosSiguienteMes() {
+        let nextMonth = fechaActualCalendario.getMonth() + 1;
+        let nextYear = fechaActualCalendario.getFullYear();
         if (nextMonth > 11) {
             nextMonth = 0;
             nextYear++;
         }
 
-        const sundaysNextMonth = obtenerDomingos(nextYear, nextMonth);
-
-        try {
-            await $.ajax({
-                url: "../calendario/storeCalendary.php",
-                type: "POST",
-                data: JSON.stringify({
-                    sundaysNext: sundaysNextMonth
-                }),
-                contentType: "application/json"
+        const sundaysNext = obtenerDomingos(nextYear, nextMonth);
+        updateCalendarData({
+                sundaysNext: sundaysNext
+            })
+            .done(function(response) {
+                // Domingos del mes siguiente actualizados correctamente.
+            })
+            .fail(function(xhr, status, error) {
+                console.error("Error al guardar los domingos del mes siguiente:", error);
             });
-            //console.log("Domingos del mes siguiente guardados:", sundaysNextMonth);
-        } catch (error) {
-            console.error("Hubo un error al guardar los domingos del mes siguiente:", error);
-        }
     }
 
-    // Función para remover días pasados de hoy
-    async function removerDiasPasadosDeHoy() {
-        try {
-            const response = await $.ajax({
-                url: "../calendario/fechasCalendario.json",
-                type: "GET",
-                dataType: "json"
-            });
-
-            const filteredDates = response.filter((date) => {
-                const dateObj = new Date(date.year, date.month - 1, date.day);
-                return dateObj >= obtenerDiaHoy();
-            });
-
-            if (filteredDates.length !== response.length) {
-                await $.ajax({
-                    url: "../calendario/storeCalendary.php",
-                    type: "POST",
-                    data: JSON.stringify({
-                        cleanDates: true,
-                        dates: filteredDates,
-                    }),
-                    contentType: "application/json"
+    /*** MÓDULO DE LIMPIEZA ***/
+    // Remueve del JSON las fechas que son anteriores a hoy
+    function removerDiasPasadosDeHoy() {
+        fetchStoredDatesCalendario()
+            .done(function(response) {
+                const filteredDates = response.filter(date => {
+                    const dateObj = new Date(date.year, date.month - 1, date.day);
+                    return dateObj >= obtenerDiaHoyCalendario();
                 });
-                //console.log("Fechas antiguas eliminadas:", filteredDates);
-                renderizarCalendario();
-            }
-        } catch (error) {
-            console.error("Error al obtener las fechas guardadas:", error);
-        }
+
+                if (filteredDates.length !== response.length) {
+                    updateCalendarData({
+                            cleanDates: true,
+                            dates: filteredDates
+                        })
+                        .done(function(response) {
+                            renderizarCalendario();
+                        })
+                        .fail(function(xhr, status, error) {
+                            console.error("Error al eliminar las fechas antiguas:", error);
+                        });
+                }
+            })
+            .fail(function(xhr, status, error) {
+                console.error("Error al obtener las fechas guardadas:", error);
+            });
     }
 
-    // Función para validar el calendario
-    async function validarCalendario() {
-        try {
-            const response = await $.ajax({
-                url: "../calendario/fechasCalendario.json",
-                type: "GET",
-                dataType: "json"
-            });
-            return Array.isArray(response);
-        } catch (error) {
-            console.error("Error al obtener las fechas:", error);
-            return false;
-        }
+    /*** VALIDACIÓN INICIAL DEL CALENDARIO ***/
+    function validarCalendario() {
+        return new Promise((resolve, reject) => {
+            fetchStoredDatesCalendario()
+                .done(function(response) {
+                    if (response && Array.isArray(response)) {
+                        resolve(true);
+                    } else {
+                        resolve(false);
+                    }
+                })
+                .fail(function(xhr, status, error) {
+                    console.error("Error al obtener las fechas:", error);
+                    reject(false);
+                });
+        });
     }
 
-    // Función principal para iniciar el calendario
-    async function iniciarCalendario() {
-        const validacionExitosa = await validarCalendario();
+    /*** INICIALIZACIÓN AL CARGAR DOCUMENTO ***/
+    $(document).ready(function() {
+        validarCalendario()
+            .then((validacionExitosa) => {
+                if (validacionExitosa) {
+                    removerDiasPasadosDeHoy();
+                    actualizarDomingosEsteMes();
+                    actualizarDomingosSiguienteMes();
 
-        if (validacionExitosa) {
-            await removerDiasPasadosDeHoy();
-            renderizarCalendario();
-            await domingosEsteMes();
-            await domingosSiguenteMes();
+                    $("#prev-month").on("click", function() {
+                        cambiarMes(-1);
+                    });
+                    $("#next-month").on("click", function() {
+                        cambiarMes(1);
+                    });
 
-            $("#prev-month").on("click", function() {
-                cambiarMes(-1);
+                    // Renderizamos el calendario tras las validaciones
+                    /* renderizarCalendario(); */
+                } else {
+                    console.log("No se pueden ejecutar las acciones. Las validaciones no han sido completadas.");
+                }
+            })
+            .catch((error) => {
+                console.log("Error en la validación:", error);
             });
-            $("#next-month").on("click", function() {
-                cambiarMes(1);
-            });
-        } else {
-            console.log("No se pueden ejecutar las acciones. Las validaciones no han sido completadas.");
-        }
-    }
-
-    // Iniciar el calendario al cargar la página
-    $(document).ready(iniciarCalendario);
+    });
 </script>

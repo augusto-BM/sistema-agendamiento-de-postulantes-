@@ -1,38 +1,74 @@
-console.log("JS de agendas");
+console.log("JS de agendas 2");
 
-$(document).ready(function () {
-  // Función para filtrar las asistencias por las fechas seleccionadas
-  function filtrarAsistencias() {
-    var fechaInicio = $("#fechaInicio").val();
-    var fechaFin = $("#fechaFin").val();
+// VARIABLES GLOBALES
+var page = 1;
+var limit = 50;
+var totalRecords = 0;
 
-    if (!fechaInicio || !fechaFin) {
-      alert("Por favor, selecciona ambas fechas antes de filtrar.");
-      return;
-    }
+var idrolSesion = $("#idrolSesion").val();
+var nombreUsuarioSesion = $("#nombreUsuarioSesion").val();
+var filtroSedes = $("#filtroSedes").val();
+var filtroEstado = $("#filtroEstado").val();
+var filtroRecultador = $("#filtroRecultador").val();
 
-    var searchQuery = $("#buscarSearchData").val().trim(); // Capturamos la búsqueda por colaborador, empresa, o cargo
+// Función para actualizar las fechas según el filtro
+function actualizarFechas(filtro) {
+  var fechaInicio, fechaFin;
+  var fechaActual = obtenerFechaLima();
 
-    $.ajax({
-      url: "datosReporte.php",
-      method: "GET",
-      data: {
-        fechaInicio: fechaInicio,
-        fechaFin: fechaFin,
-        searchQuery: searchQuery, // Enviamos la consulta de búsqueda al backend
-      },
-      success: function (response) {
-        arrrayTodaLaData = JSON.parse(response); // Almacenar todos los datos
-        totalResultadoData = arrrayTodaLaData.length; // Total de resultados
-        mostrarPagina(paginaActual); // Mostrar los datos de la página actual
-        actualizarResultadoCount(); // Actualizar el mensaje de cantidad de resultados
-      },
-      error: function (xhr, status, error) {
-        console.error("Error en la solicitud AJAX: ", status, error);
-      },
-    });
+  // Cambiar las fechas según el filtro seleccionado
+  switch (filtro) {
+    case "hoy":
+      fechaInicio = fechaActual;
+      fechaFin = fechaActual;
+      break;
+    case "ayer":
+      fechaActual.setDate(fechaActual.getDate() - 1);
+      fechaInicio = fechaActual;
+      fechaFin = fechaActual;
+      break;
+    case "semana":
+      fechaActual.setDate(fechaActual.getDate() - 7);
+      fechaInicio = fechaActual;
+      fechaFin = obtenerFechaLima();
+      break;
+    case "mes":
+      fechaActual.setMonth(fechaActual.getMonth() - 1);
+      fechaInicio = fechaActual;
+      fechaFin = obtenerFechaLima();
+      break;
+    case "tresMeses":
+      fechaActual.setMonth(fechaActual.getMonth() - 3);
+      fechaInicio = fechaActual;
+      fechaFin = obtenerFechaLima();
+      break;
+    case "seisMeses":
+      fechaActual.setMonth(fechaActual.getMonth() - 6);
+      fechaInicio = fechaActual;
+      fechaFin = obtenerFechaLima();
+      break;
+    case "doceMeses":
+      fechaActual.setMonth(fechaActual.getMonth() - 12);
+      fechaInicio = fechaActual;
+      fechaFin = obtenerFechaLima();
+      break;
+    default:
+      fechaInicio = null;
+      fechaFin = null;
+      break;
   }
 
+  // Asignar las fechas a los campos
+  if (fechaInicio && fechaFin) {
+    $("#fechaInicio").val(formatearFecha(fechaInicio));
+    $("#fechaFin").val(formatearFecha(fechaFin));
+  } else {
+    $("#fechaInicio").val("");
+    $("#fechaFin").val("");
+  }
+}
+
+$(document).ready(function () {
   // Filtrar por el selector de fechas
   $("#filtroFecha").on("change", function () {
     var filtro = $(this).val();
@@ -42,63 +78,63 @@ $(document).ready(function () {
       $('#filtroFecha option[value=""]').hide();
     }
 
-    // Cambiar las fechas según el filtro seleccionado
-    switch (filtro) {
-      case "hoy":
-        var hoy = obtenerFechaLima();
-        $("#fechaInicio").val(formatearFecha(hoy));
-        $("#fechaFin").val(formatearFecha(hoy));
-        break;
-      case "ayer":
-        var ayer = obtenerFechaLima();
-        ayer.setDate(ayer.getDate() - 1);
-        $("#fechaInicio").val(formatearFecha(ayer));
-        $("#fechaFin").val(formatearFecha(ayer));
-        break;
-      case "semana":
-        var inicioSemana = obtenerFechaLima();
-        inicioSemana.setDate(inicioSemana.getDate() - 7);
-        $("#fechaInicio").val(formatearFecha(inicioSemana));
-        $("#fechaFin").val(formatearFecha(obtenerFechaLima()));
-        break;
-      case "mes":
-        var mes = obtenerFechaLima();
-        mes.setMonth(mes.getMonth() - 1);
-        $("#fechaInicio").val(formatearFecha(mes));
-        $("#fechaFin").val(formatearFecha(obtenerFechaLima()));
-        break;
-      case "tresMeses":
-        var tresMeses = obtenerFechaLima();
-        tresMeses.setMonth(tresMeses.getMonth() - 3);
-        $("#fechaInicio").val(formatearFecha(tresMeses));
-        $("#fechaFin").val(formatearFecha(obtenerFechaLima()));
-        break;
-      case "seisMeses":
-        var seisMeses = obtenerFechaLima();
-        seisMeses.setMonth(seisMeses.getMonth() - 6);
-        $("#fechaInicio").val(formatearFecha(seisMeses));
-        $("#fechaFin").val(formatearFecha(obtenerFechaLima()));
-        break;
-      case "doceMeses":
-        var doceMeses = obtenerFechaLima();
-        doceMeses.setMonth(doceMeses.getMonth() - 12);
-        $("#fechaInicio").val(formatearFecha(doceMeses));
-        $("#fechaFin").val(formatearFecha(obtenerFechaLima()));
-        break;
-      default:
-        $("#fechaInicio").val("");
-        $("#fechaFin").val("");
-        break;
-    }
-
-    // Al cambiar el filtro en el select, se oculta el botón de búsqueda
+    actualizarFechas(filtro);
     $("#btnBuscarFecha").hide();
-    filtrarAsistencias();
   });
 
   // Establecer la fecha de hoy como valor predeterminado al cargar la página
-  var mes = obtenerFechaLima();
-  mes.setMonth(mes.getMonth() - 1);
-  $("#fechaInicio").val(formatearFecha(mes));
+  var fechaPredeterminada = obtenerFechaLima();
+  fechaPredeterminada.setMonth(fechaPredeterminada.getMonth() - 1);
+  $("#fechaInicio").val(formatearFecha(fechaPredeterminada));
   $("#fechaFin").val(formatearFecha(obtenerFechaLima()));
+
+  console.log("Fecha inicio: " + $("#fechaInicio").val());
+  console.log("Fecha fin: " + $("#fechaFin").val());
+
+  // Validar y asignar null a los filtros si es igual a "TODOS"
+  if (filtroSedes === "TODOS") {
+    filtroSedes = null;
+  }
+  if (filtroEstado === "TODOS") {
+    filtroEstado = null;
+  }
+  if (filtroRecultador === "TODOS") {
+    filtroRecultador = null;
+  }
+
+  // Si el rol es 2 o 4, entonces nombreUsuario debe ser null
+  if (idrolSesion == 2 || idrolSesion == 4) {
+    nombreUsuarioSesion = null;
+  }
+
+  // Verificar los valores que se enviarán en la solicitud
+  var dataToSend = {
+    idrolSesion: idrolSesion,
+    filtroSedes: filtroSedes === "TODOS" ? null : filtroSedes, // Asegúrate de enviar null
+    filtroEstado: filtroEstado === "TODOS" ? null : filtroEstado,
+    filtroRecultador: filtroRecultador === "TODOS" ? null : filtroRecultador,
+    filtroNombreUsuarioSesion: nombreUsuarioSesion,
+    fechaInicio: $("#fechaInicio").val(),
+    fechaFin: $("#fechaFin").val(),
+    page: page,
+    limit: limit,
+  };
+
+  // Mostrar los datos en consola
+  console.log("Datos que se enviarán:", dataToSend);
+
+  // Realizar la solicitud AJAX para enviar los datos
+  $.ajax({
+    url: "../../controller/agenda/agendaController.php?accion=AgendasAjax", // Reemplaza con la URL a la que deseas enviar los datos
+    method: "GET",
+    data: dataToSend,
+    success: function (response) {
+      console.log("Datos enviados correctamente");
+      // Aquí puedes manejar la respuesta si es necesario
+      console.log(response);
+    },
+    error: function (xhr, status, error) {
+      console.log("Error al enviar los datos: " + error);
+    },
+  });
 });

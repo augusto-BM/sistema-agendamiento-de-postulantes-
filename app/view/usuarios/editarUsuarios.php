@@ -167,6 +167,7 @@ $date = $obj3->mostrarUsuario($identificador);
     </form>
 </div>
 
+<!-- AJAX EDITAR USUARIOS -->
 <script>
     console.log("Script archivo editar usuario ...");
 
