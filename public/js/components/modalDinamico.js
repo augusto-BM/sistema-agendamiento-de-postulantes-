@@ -14,46 +14,15 @@ $(document).on("click", ".abrirModal", function (event) {
     '<span class="fw-light">' + prefix + "</span> " + modalTitle
   );
 
-  // Condicionar el estilo del modal según el tipo de contenido
-  if (modalId === "calendario") {
-    // Para el calendario, podemos ajustar la altura y los estilos
-    $("#modalDinamico .modal-dialog").removeClass(
-      "modal-xl"
-    ) /* .addClass('modal-lg') */;
-    $("#modalDinamico .modal-body").css({
-      display: "flex",
-      "justify-content": "center",
-      "align-items": "flex-start",
-      height: "100%",
-      "overflow-y": "auto",
-      padding: "0",
-    });
-    $("#modalDinamico .modal-content").css({
-      height: "500px",
-    });
-    /* $('#modalDinamicoLabel').text('Calendario'); */
-  } else {
-    // Para otros modales, asegurarse de usar la clase de tamaño grande
-    $("#modalDinamico .modal-dialog")
-      .removeClass("modal-lg")
-      .addClass("modal-xl");
-    $("#modalDinamico .modal-body").removeAttr("style");
-  }
-
-  // Definir la URL según el tipo de contenido a cargar
-  var url;
-  if (modalId === "calendario") {
-    url = "../calendario/" + modalId + ".php"; // Ruta para el calendario
-  } else {
-    url = modalId + ".php"; // Ruta genérica para otros modales
-  }
-
+  // Ruta del nombre del archivo que contiene el contenido del modal
+  var url = modalId + ".php"; 
+ 
   // Datos adicionales que se enviarán si el identificador existe
   var dataToSend = identificador ? { identificador: identificador } : {};
 
   // Hacer la petición Ajax para cargar el contenido en el modal dinámico
   $.ajax({
-    url: url, // Usar la URL definida arriba
+    url: url, 
     type: "GET",
     data: dataToSend,
     success: function (response) {
@@ -65,24 +34,6 @@ $(document).on("click", ".abrirModal", function (event) {
         document.getElementById("modalDinamico")
       );
       myModal.show();
-
-      // Si el modal es de calendario, espera a que esté completamente visible para renderizarlo
-      if (modalId === "calendario") {
-        $("#modalDinamico").off("shown.bs.modal").on("shown.bs.modal", function () {
-          if (typeof renderizarCalendario === "function") {
-            console.log("Renderizando calendario1...");
-            renderizarCalendario();
-          }
-        });
-      }
-/*         if (modalId === "calendario") {
-          $("#modalDinamico").one("shown.bs.modal", function () {
-            if (typeof renderizarCalendario === "function") {
-              console.log("Renderizando calendario3...");
-              renderizarCalendario();
-            }
-          });
-        } */
     },
     error: function () {
       alert("Hubo un error al cargar el contenido.");
@@ -92,11 +43,7 @@ $(document).on("click", ".abrirModal", function (event) {
 
 // Limpiar el contenido del modal cuando se cierre
 $("#modalDinamico").on("hidden.bs.modal", function () {
-  if (typeof renderizarCalendario === "function") {
-    console.log("Renderizando calendario123...");
-    renderizarCalendario();
-    renderizarCalendario();
-  }
+
   //console.log("Modal cerrado");
   // Vaciar el contenido HTML del modal (esto incluye tablas, scripts, formularios, etc.)
   $("#modalDinamico .modal-body").empty();
@@ -104,7 +51,7 @@ $("#modalDinamico").on("hidden.bs.modal", function () {
   // Eliminar cualquier script cargado dinámicamente
   $("#modalDinamico script").remove();
 
-  // Limpiar formularios (si los hay)
+  // Limpiar formularios 
   $("#modalDinamico form").trigger("reset"); // Resetea todos los campos del formulario
 
   // Limpiar entradas específicas
@@ -114,13 +61,6 @@ $("#modalDinamico").on("hidden.bs.modal", function () {
 
   // Si tienes tablas, puedes eliminarlas explícitamente (aunque `empty()` también las elimina)
   $("#modalDinamico .modal-body table").remove();
-
-  // Restaurar los estilos predeterminados del modal después de cerrarlo
-  $("#modalDinamico .modal-dialog") /* .removeClass('modal-lg') */
-    .addClass("modal-xl");
-  $("#modalDinamico .modal-body").removeAttr("style");
-  $("#modalDinamico .modal-content").removeAttr("style");
-  $("#modalDinamicoLabel").text("Título del Modal");
 
   // Obtener la instancia del modal y destruirla para evitar acumulación de instancias
   var myModal = bootstrap.Modal.getInstance(

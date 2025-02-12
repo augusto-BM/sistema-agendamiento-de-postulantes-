@@ -1,7 +1,7 @@
 <?php
 session_start();
 header("Content-Type: text/html;charset=utf-8");
-if (!empty($_SESSION['nombre_sesion'])) {
+if (!empty($_SESSION['activo'])) {
     header("Location: ./app/view/inicio/inicio.php");
     exit();
 }

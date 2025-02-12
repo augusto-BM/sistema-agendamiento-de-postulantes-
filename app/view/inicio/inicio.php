@@ -10,7 +10,7 @@
         define('ARCHIVOS_CSS', [/* 'sidebar','navbar', 'plantilla' */]);           
         
         //Nombre de los archivos JS a importar 
-        define('ARCHIVOS_JS', [/* 'sidebar', */ 'principal']);  
+        define('ARCHIVOS_JS', ['principal']);  
 
         //Incluir las rutas dinamicos
         require_once '../../../config/rutas/rutas.php';
@@ -160,8 +160,7 @@
             </section>
         </main>
     </div>
-    <?php require_once '../components/alertaSesion.php' ?>
-
+    
     <!-- RUTAS DE LOS SCRIPTS NECESARIOS -->
     <?php file_exists(RUTA_SCRIPTS) ? require_once RUTA_SCRIPTS : print "Error: No se pudo incluir el archivo de scripts."; ?>
     

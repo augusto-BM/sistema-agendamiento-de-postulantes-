@@ -10,7 +10,7 @@ define('SECCION', 'agenda');
 define('ARCHIVOS_CSS', ['tablaUsuarios']);
 
 //Nombre de los archivos JS a importar en esta vista
-define('ARCHIVOS_JS', ['ajaxListarAgendas']);
+define('ARCHIVOS_JS', ['ajaxListarAgenda']);
 
 //Incluir las rutas dinamicos
 require_once '../../../config/rutas/rutas.php';
@@ -71,13 +71,40 @@ if (isset($_SESSION['activo'])) {
 
                                 $soloRolPermitido = in_array($idrol, [2, 4]); //MODERADOR y ADMIN 
                                 $displayCompleto = $soloRolPermitido ? '' : 'display: none;';
-                                $idBtnAcceso = $soloRolPermitido ? 'btn_filtroCompleto' : 'btn_filtroRestringido';
                                 ?>
+
                                 <input type="hidden" id="idrolSesion" value="<?= $idrol; ?>" name="idrolSesion">
                                 <input type="hidden" id="nombreUsuarioSesion" value="<?= $nombreusuario; ?>" name="nombreUsuarioSesion">
-                                <div class="row filtradoFecha" style="<?= $displayCompleto; ?>">
+
+                                <div class="row filtradoAdmin">
+                                    <div class="col-md-2">
+                                        <label class="form-label" for="filtroFecha">Selecciona:</label>
+                                        <select class="form-control" id="filtroFecha">
+                                            <option style="display: none;" value="" disabled>Fecha Personalizada</option>
+                                            <option value="hoy">Hoy</option>
+                                            <option value="ayer">Ayer</option>
+                                            <option value="semana">Ultimos 7 dias</option>
+                                            <option value="mes" selected>Ultimo mes</option>
+                                            <option value="tresMeses">Ultimos 3 meses</option>
+                                            <option value="seisMeses">Ultimos 6 meses</option>
+                                            <option value="doceMeses">Ultimos 12 meses</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="fecha_col">
+                                            <label class="form-label" for="fechaInicio">Desde:</label>
+                                            <input class="form-control" type="date" id="fechaInicio">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="fecha_col">
+                                            <label class="form-label" for="fechaFin">Hasta:</label>
+                                            <input class="form-control" type="date" id="fechaFin">
+                                        </div>
+                                    </div>
+
                                     <!-- SELECT PARA FILTRAR LAS SEDES -->
-                                    <div class="col-md-3">
+                                    <div class="col-md-2" style="<?= $displayCompleto; ?>">
                                         <label class="form-label" for="filtroSedes">Sede</label>
                                         <select class="form-control" id="filtroSedes">
                                             <option value="TODOS" selected>TODOS</option>
@@ -90,7 +117,7 @@ if (isset($_SESSION['activo'])) {
                                             <?php endif; ?>
                                         </select>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-2" style="<?= $displayCompleto; ?>">
                                         <label class="form-label" for="filtroEstado">Estado</label>
                                         <select class="form-control" id="filtroEstado">
                                             <option value="TODOS" selected>TODOS</option>
@@ -100,7 +127,7 @@ if (isset($_SESSION['activo'])) {
                                             <option value="ASISTIERON">ASISTIERON</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-2" style="<?= $displayCompleto; ?>">
                                         <label class="form-label" for="filtroRecultador">Reclutador</label>
                                         <select class="form-control" id="filtroRecultador">
                                             <option value="TODOS" selected>TODOS</option>
@@ -114,107 +141,67 @@ if (isset($_SESSION['activo'])) {
                                         </select>
                                     </div>
                                 </div>
-
-                                <div class="row mt-2 filtradoFecha">
-                                    <div class="col-md-3">
-                                        <label class="form-label" for="filtroFecha">Selecciona filtro:</label>
-                                        <select class="form-control" id="filtroFecha">
-                                            <option style="display: none;" value="" disabled>Fecha Personalizada</option>
-                                            <option value="hoy">Hoy</option>
-                                            <option value="ayer">Ayer</option>
-                                            <option value="semana">Ultimos 7 dias</option>
-                                            <option value="mes" selected>Ultimo mes</option>
-                                            <option value="tresMeses">Ultimos 3 meses</option>
-                                            <option value="seisMeses">Ultimos 6 meses</option>
-                                            <option value="doceMeses">Ultimos 12 meses</option>
-                                        </select>
-                                    </div>
-
+                            </div>
+                            <br>
+                            <!-- Bootstrap Table with Header - Light -->
+                            <div class="card">
+                                <div class="row">
                                     <div class="col-md-7">
-                                        <div class="row">
-                                            <div class="col-md-4">
-                                                <div class="fecha_col">
-                                                    <label class="form-label" for="fechaInicio">Desde:</label>
-                                                    <input class="form-control" type="date" id="fechaInicio">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <div class="fecha_col">
-                                                    <label class="form-label" for="fechaFin">Hasta:</label>
-                                                    <input class="form-control" type="date" id="fechaFin">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4 d-flex flex-column justify-content-end">
-                                                <div class="fecha_col">
-                                                    <button id="<?= $idBtnAcceso; ?>" class="btn btn-primary btn_buscar">Buscar</button>
-                                                </div>
+                                        <h5 class="titulo-tabla mb-0">Lista de Agendas</h5>
+                                    </div>
+
+                                    <div class="col-md-5 d-flex flex-column justify-content-center">
+                                        <div class="row m-2">
+                                            <div class="col-md-12 d-flex align-items-center">
+                                                <button id="btn_buscarAgendaFiltros" class="btn btn-primary btn_buscar"
+                                                    style="margin-right: 3px; display: none;">Buscar</button>
+                                                <input class="form-control" type="search" id="buscarSearchData"
+                                                    placeholder="Buscar Postulante, DNI o Celular">
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-2">
-                                    </div>
                                 </div>
+
+
+                                <p class="text-center">
+                                    <i id="resultadoCountAgenda">Se encontró 0 resultados <span id="busquedaRealizadaAgendas"></span>
+                                    </i>
+                                </p>
+
+                                <div class="table-responsive col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                    <table class="table table-borderless table-hover w-100 tabla-general" id="myTablaAgendas">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th style="display: none;">id</th>
+                                                <th class="text-center">#</th>
+                                                <th>FECHA REGISTRO</th>
+                                                <th>POSTULANTE</th>
+                                                <th>DOC</th>
+                                                <th>N° DOC.</th>
+                                                <th>EDAD</th>
+                                                <th>TELEFONO</th>
+                                                <th>DISTRITO</th>
+                                                <th>FUENTE</th>
+                                                <th>CONTACTO</th>
+                                                <th>ESTADO</th>
+                                                <th>DETALLE</th>
+                                                <th>FECHA AGENDA</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="table-border-bottom-0" id="data-body">
+                                            <!-- Aquí van los datos de la tabla -->
+                                            <!-- Los datos serán llenados por AJAX -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="pagination m-2 d-flex justify-content-center" id="pagination"></div>
                             </div>
+
+                            <!-- FOOTER -->
+                            <?php file_exists(RUTA_FOOTER) ? require_once RUTA_FOOTER : print "Error: No se pudo incluir el archivo de encabezado."; ?>
+                            <!-- FINALIZA FOOTER -->
                         </div>
-                        <br>
-
-                        <!-- Bootstrap Table with Header - Light -->
-                        <div class="card">
-                            <div class="row">
-                                <div class="col-md-7">
-                                    <h5 class="titulo-tabla">Lista de Agendas</h5>
-                                </div>
-
-                                <div class="col-md-5 d-flex flex-column justify-content-center">
-                                    <div class="row m-2">
-                                        <div class="col-md-12 d-flex">
-                                            <button id="btnBuscarSearchData" class="btn btn-primary btn_buscar"
-                                                style="margin-right: 3px; display: none;">Buscar</button>
-                                            <input class="form-control" type="search" id="buscarSearchData"
-                                                placeholder="Buscar Postulante, DNI o Celular">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <p class="text-center">
-                                <i id="resultadoCountAgenda">Se encontró 0 resultados <span id="busquedaRealizadaAgendas"></span>
-                                </i>
-                            </p>
-
-                            <div class="table-responsive col-sm-12 col-md-12 col-lg-12 col-xl-12">
-                                <table class="table table-borderless table-hover w-100 tabla-general" id="myTablaAgendas">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th style="display: none;">id</th>
-                                            <th class="text-center">#</th>
-                                            <th>FECHA REGISTRO</th>
-                                            <th>POSTULANTE</th>
-                                            <th>DOC</th>
-                                            <th>N° DOC.</th>
-                                            <th>EDAD</th>
-                                            <th>TELEFONO</th>
-                                            <th>DISTRITO</th>
-                                            <th>FUENTE</th>
-                                            <th>CONTACTO</th>
-                                            <th>ESTADO</th>
-                                            <th>DETALLE</th>
-                                            <th>FECHA AGENDA</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="table-border-bottom-0" id="data-body">
-                                        <!-- Aquí van los datos de la tabla -->
-                                        <!-- Los datos serán llenados por AJAX -->
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="pagination m-2 d-flex justify-content-center" id="pagination"></div>
-                        </div>
-
-                        <!-- FOOTER -->
-                        <?php file_exists(RUTA_FOOTER) ? require_once RUTA_FOOTER : print "Error: No se pudo incluir el archivo de encabezado."; ?>
-                        <!-- FINALIZA FOOTER -->
                     </div>
                 </section>
             </main>

@@ -2,12 +2,13 @@
 <nav class="mi-navbar">
     <!-- Iconos a la izquierda -->
     <div class="mi-navbar-izquierda">
-        <a href="" class="abrirModal" title="Calendario" data-id="calendario" data-titulo="Dias no laborables"
-            data-prefix="Calendario/"><i class="fa-solid fa-calendar-days"></i></a>
+        <!-- <a href="" class="abrirModal" title="Calendario" data-id="calendario" data-titulo="Dias no laborables"
+            data-prefix="Calendario/"><i class="fa-solid fa-calendar-days"></i></a> -->
         <!-- <a href="#"><i class="fa-solid fa-cake-candles"></i></a> -->
 
         <!-- MODAL DINÁMICO -->
         <?php require_once '../components/modalDinamico.php'; ?>
+        <?php require_once '../components/alertaSesion.php' ?>
 
     </div>
 

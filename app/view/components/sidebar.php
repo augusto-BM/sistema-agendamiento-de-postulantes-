@@ -1,7 +1,7 @@
 <!--  -->
 <div class="sidebar-menu-btn" id="sidebar-menu-btn">
-    <i class="bx bx-menu"></i>
-    <i class="bx bx-x"></i>
+    <i class="fa-solid fa-bars"></i>
+    <i class="fa-solid fa-chevron-right"></i>
 </div>
 
 <aside class="sidebar-plantilla" id="sidebar-plantilla">
@@ -19,8 +19,14 @@
             <i class="bx bx-search"></i>
             <input type="search" placeholder="Buscar...">
         </div> -->
-        <img src="../../../public/img/login/jbgoperator.png" style="width: 200px;" alt="logo">
+        <?php
+        $nombreEmpresaMayusucla = strtoupper(str_replace(' ', '', $nombreempresa));
+        $logoRuta = "../../../public/img/login/{$nombreEmpresaMayusucla}.png";
+        $defaultLogo = '../../../public/img/login/no_image.png';
+        $logo = (file_exists($logoRuta)) ? $logoRuta : $defaultLogo;
+        echo "<img src='{$logo}' style='width: 200px;' alt='logo'>";
 
+        ?>
 
         <ul class="menu-sidebar">
             <li class="menu-item menu-item-static active">
@@ -29,24 +35,20 @@
                     <span>Inicio</span>
                 </a>
             </li>
+
             <li class="menu-item menu-item-static">
                 <a href="../agenda/agendas.php" class="menu-link">
                     <i class="fa-solid fa-calendar"></i>
                     <span>Agenda</span>
                 </a>
             </li>
-<!--             <li class="menu-item menu-item-dropdown">
-                <a href="" class="menu-link subMenuBtn">
-                    <i class="fa-solid fa-calendar"></i>
-                    <span>Agenda</span>
-                    <i class="bx bx-chevron-down "></i>
+            <li class="menu-item menu-item-static">
+                <a href="../calendario/calendario.php" class="menu-link">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <span>Calendario</span>
                 </a>
-                <ul class="sub-menu">
-                    <li><a href="#" class="sub-menu-link">Registrar</a></li>
-                    <li><a href="../agenda/agendas.php" class="sub-menu-link">Agenda</a></li>
-                    <li><a href="#" class="sub-menu-link">Buscar</a></li>
-                </ul>
-            </li> -->
+            </li>
+
             <li class="menu-item menu-item-static">
                 <a href="../usuarios/usuarios.php" class="menu-link">
                     <i class="fa-solid fa-user"></i>
@@ -57,7 +59,7 @@
                 <a href="" class="menu-link subMenuBtn">
                     <i class="fa-solid fa-file"></i>
                     <span>Reportes</span>
-                    <i class="bx bx-chevron-down "></i>
+                    <i class="fa-solid fa-chevron-down"></i>
                 </a>
                 <ul class="sub-menu">
                     <li><a href="#" class="sub-menu-link">Eficiencia</a></li>

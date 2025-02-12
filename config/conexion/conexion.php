@@ -5,7 +5,8 @@ class Database {
     private $connection;
 
     // Configuración de la base de datos
-    private $host = 'localhost';
+    private $host = 'localhost'; 
+    //private $host = 'localhost:8080';  
     private $dbname = 'jbgopera_agendamiento';
     private $username = 'root';
     private $password = '';
