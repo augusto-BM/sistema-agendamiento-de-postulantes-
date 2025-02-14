@@ -37,8 +37,12 @@ require_once '../../../config/datossesion/datossesion.php'
                             <option value="" disabled selected>SELECCIONE</option>
                             <?php if ($sedes): ?>
                                 <?php foreach ($sedes as $sede): ?>
-                                    <option value="<?= $sede->idempresa; ?>" data-nombresede="<?= $sede->nombresede; ?>"
-                                        data-nombreempresa="<?= $sede->nombreempresa; ?>"><?= $sede->nombreempresa; ?></option>
+                                    <option value="<?= $sede->idempresa; ?>"
+                                        data-nombresede="<?= $sede->nombresede; ?>"
+                                        data-nombreempresa="<?= $sede->nombreempresa; ?>"
+                                        <?= ($sede->nombreempresa == $nombreempresa) ? 'selected' : ''; ?>>
+                                        <?= $sede->nombreempresa; ?>
+                                    </option>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <option value="" disabled>No hay empresas activas</option>
@@ -110,40 +114,13 @@ require_once '../../../config/datossesion/datossesion.php'
                                 title="Campo obligatorio">*</span></label>
                         <select type="text" id="cboedad" name="cboedad" class="form-control" required>
                             <option value="" disabled selected>SELECCIONE</option>
-                            <option value="18">18</option>
-                            <option value="19">19</option>
-                            <option value="20">20</option>
-                            <option value="21">21</option>
-                            <option value="22">22</option>
-                            <option value="23">23</option>
-                            <option value="24">24</option>
-                            <option value="25">25</option>
-                            <option value="26">26</option>
-                            <option value="27">27</option>
-                            <option value="28">28</option>
-                            <option value="29">29</option>
-                            <option value="30">30</option>
-                            <option value="31">31</option>
-                            <option value="32">32</option>
-                            <option value="33">33</option>
-                            <option value="34">34</option>
-                            <option value="35">35</option>
-                            <option value="36">36</option>
-                            <option value="37">37</option>
-                            <option value="38">38</option>
-                            <option value="39">39</option>
-                            <option value="40">40</option>
-                            <option value="41">41</option>
-                            <option value="42">42</option>
-                            <option value="43">43</option>
-                            <option value="44">44</option>
-                            <option value="45">45</option>
-                            <option value="46">46</option>
-                            <option value="47">47</option>
-                            <option value="48">48</option>
-                            <option value="49">49</option>
-                            <option value="50">50</option>
+                            <?php
+                            for ($edad = 18; $edad <= 50; $edad++) {
+                                echo "<option value=\"$edad\">$edad</option>";
+                            }
+                            ?>
                         </select>
+
                         <div class="invalid-feedback">Este campo es obligatorio.</div>
                     </div>
 
@@ -152,7 +129,7 @@ require_once '../../../config/datossesion/datossesion.php'
                                 title="Campo obligatorio">*</span></label>
                         <select type="text" id="cbodistrito" name="cbodistrito" class="form-control" required>
                             <option value="" disabled selected>SELECCIONE</option>
-                            <option value="ANCÓN">ANCÓN</option>
+                            <option value="ANCON">ANCON</option>
                             <option value="ATE">ATE</option>
                             <option value="BARRANCO">BARRANCO</option>
                             <option value="BREÑA">BREÑA</option>
@@ -163,38 +140,38 @@ require_once '../../../config/datossesion/datossesion.php'
                             <option value="COMAS">COMAS</option>
                             <option value="EL AGUSTINO">EL AGUSTINO</option>
                             <option value="INDEPENDENCIA">INDEPENDENCIA</option>
-                            <option value="JESÚS MARÍA">JESÚS MARÍA</option>
+                            <option value="JESUS MARIA">JESUS MARIA</option>
                             <option value="LA MOLINA">LA MOLINA</option>
                             <option value="LA VICTORIA">LA VICTORIA</option>
                             <option value="LIMA CENTRO">LIMA CENTRO</option>
                             <option value="LINCE">LINCE</option>
                             <option value="LOS OLIVOS">LOS OLIVOS</option>
                             <option value="LURIGANCHO">LURIGANCHO</option>
-                            <option value="LURÍN">LURÍN</option>
+                            <option value="LURIN">LURIN</option>
                             <option value="MAGDALENA DEL MAR">MAGDALENA DEL MAR</option>
                             <option value="MIRAFLORES">MIRAFLORES</option>
-                            <option value="PACHACÁMAC">PACHACÁMAC</option>
+                            <option value="PACHACAMAC">PACHACAMAC</option>
                             <option value="PUCUSANA">PUCUSANA</option>
                             <option value="PUEBLO LIBRE">PUEBLO LIBRE</option>
                             <option value="PUENTE PIEDRA">PUENTE PIEDRA</option>
                             <option value="PUNTA HERMOSA">PUNTA HERMOSA</option>
                             <option value="PUNTA NEGRA">PUNTA NEGRA</option>
-                            <option value="RÍMAC">RÍMAC</option>
+                            <option value="RIMAC">RIMAC</option>
                             <option value="SAN BARTOLO">SAN BARTOLO</option>
                             <option value="SAN BORJA">SAN BORJA</option>
                             <option value="SAN ISIDRO">SAN ISIDRO</option>
                             <option value="SAN JUAN DE LURIGANCHO">SAN JUAN DE LURIGANCHO</option>
                             <option value="SAN JUAN DE MIRAFLORES">SAN JUAN DE MIRAFLORES</option>
                             <option value="SAN LUIS">SAN LUIS</option>
-                            <option value="SAN MARTÍN DE PORRES">SAN MARTÍN DE PORRES</option>
+                            <option value="SAN MARTIN DE PORRES">SAN MARTIN DE PORRES</option>
                             <option value="SAN MIGUEL">SAN MIGUEL</option>
                             <option value="SANTA ANITA">SANTA ANITA</option>
-                            <option value="SANTA MARÍA DEL MAR">SANTA MARÍA DEL MAR</option>
+                            <option value="SANTA MARIA DEL MAR">SANTA MARIA DEL MAR</option>
                             <option value="SANTA ROSA">SANTA ROSA</option>
                             <option value="SANTIAGO DE SURCO">SANTIAGO DE SURCO</option>
                             <option value="SURQUILLO">SURQUILLO</option>
                             <option value="VILLA EL SALVADOR">VILLA EL SALVADOR</option>
-                            <option value="VILLA MARÍA DEL TRIUNFO">VILLA MARÍA DEL TRIUNFO</option>
+                            <option value="VILLA MARIA DEL TRIUNFO">VILLA MARIA DEL TRIUNFO</option>
                         </select>
                         <div class="invalid-feedback">Este campo es obligatorio.</div>
                     </div>
@@ -240,17 +217,16 @@ require_once '../../../config/datossesion/datossesion.php'
     </form>
 </div>
 
-<!-- SCRIPT PARA ASIGNARLE AL INPUT EL NOMBRE DE LA SEDE SELECCIONADO -->
+<!-- SCRIPT AJAX PARA ASIGNARLE AL INPUT EL NOMBRE DE LA SEDE SELECCIONADO -->
 <script>
-    document.getElementById('id_empresa').addEventListener('change', function() {
-        // Obtener la opción seleccionada
-        var selectedOption = this.options[this.selectedIndex];
+    $(document).ready(function() {
+        var nombreSede = $('#id_empresa option:selected').data('nombresede');
+        $('#nombre_sede').val(nombreSede);
 
-        // Obtener el nombre de la sede (y opcionalmente el nombre de la empresa)
-        var nombreSede = selectedOption.getAttribute('data-nombresede');
-
-        // Asignar el valor al input invisible
-        document.getElementById('nombre_sede').value = nombreSede;
+        $('#id_empresa').change(function() {
+            var nombreSede = $('#id_empresa option:selected').data('nombresede');
+            $('#nombre_sede').val(nombreSede);
+        });
     });
 </script>
 
@@ -258,8 +234,8 @@ require_once '../../../config/datossesion/datossesion.php'
 <script>
     console.log("Cargando el script validarFechaAgenda.js");
 
-    $(document).ready(async function () {
-        let fechaAsignada;  // Variable para almacenar la fecha asignada inicialmente
+    $(document).ready(async function() {
+        let fechaAsignada; // Variable para almacenar la fecha asignada inicialmente
 
         try {
             // Realizar una solicitud AJAX para cargar el archivo fechasCalendario.json
@@ -273,19 +249,19 @@ require_once '../../../config/datossesion/datossesion.php'
 
             // Crear un Set para las fechas no laborables
             const fechasNoLaborablesSet = new Set(
-                fechasNoLaborables.map(function (fecha) {
+                fechasNoLaborables.map(function(fecha) {
                     return formatearFecha(new Date(fecha.year, fecha.month - 1, fecha.day));
                 })
             );
 
             // Verificar si la fecha de mañana está en el Set de fechas no laborables
             if (!fechasNoLaborablesSet.has(mananaStr)) {
-                fechaAsignada = mananaStr;  // Guardar la fecha asignada
+                fechaAsignada = mananaStr; // Guardar la fecha asignada
                 $("#fecha_agenda").val(mananaStr);
             } else {
                 const siguienteLaborable = getSiguienteLaborable(manana, fechasNoLaborablesSet);
                 const siguienteLaborableStr = formatearFecha(siguienteLaborable);
-                fechaAsignada = siguienteLaborableStr;  // Guardar la fecha asignada
+                fechaAsignada = siguienteLaborableStr; // Guardar la fecha asignada
                 $("#fecha_agenda").val(siguienteLaborableStr);
             }
 
@@ -293,7 +269,7 @@ require_once '../../../config/datossesion/datossesion.php'
             $("#fecha_agenda").attr("min", mananaStr);
 
             // Validación al cambiar la fecha
-            $("#fecha_agenda").on('change', function () {
+            $("#fecha_agenda").on('change', function() {
                 const selectedDate = new Date($(this).val());
                 const selectedDateStr = formatearFecha(selectedDate);
 
@@ -319,7 +295,7 @@ require_once '../../../config/datossesion/datossesion.php'
                     type: "GET",
                     dataType: "json"
                 });
-                return response;  // Devuelve las fechas no laborables
+                return response; // Devuelve las fechas no laborables
             } catch (error) {
                 throw new Error("Error al cargar las fechas no laborables: " + error);
             }

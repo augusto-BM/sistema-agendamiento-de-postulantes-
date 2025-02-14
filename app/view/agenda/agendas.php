@@ -7,7 +7,7 @@ define('TITULO', 'Agenda');
 define('SECCION', 'agenda');
 
 //Nombre de los archivos CSS a importar en esta vista
-define('ARCHIVOS_CSS', ['tablaUsuarios']);
+define('ARCHIVOS_CSS', ['tablaAgendas']);
 
 //Nombre de los archivos JS a importar en esta vista
 define('ARCHIVOS_JS', ['ajaxListarAgenda']);
@@ -53,7 +53,7 @@ if (isset($_SESSION['activo'])) {
                                     Agendas <!-- Botón para añadir usuario -->
                                     <button type="button" class="btn btn-primary abrirModal"
                                         style="background-color: #19727A; color: white; border: 0px; margin-left: 20px;"
-                                        data-id="registrarAgenda" data-prefix="Agenda/"
+                                        data-id="registrarAgendas" data-prefix="Agenda/"
                                         data-titulo="Agendar Postulante">
                                         Registar <i class="fa-solid fa-plus"></i>
                                     </button>
@@ -61,13 +61,14 @@ if (isset($_SESSION['activo'])) {
 
                                 <?php
                                 require_once '../../controller/sedes/sedesController.php';
-                                require_once '../../controller/usuarios/usuariosController.php';
+                                require_once '../../controller/agenda/agendaController.php';
 
                                 $obj = new SedesController();
-                                $sedes = $obj->listarSedes($idusuario, $idrol, $idempresa);
+                                $obj2 = new agendaController();
 
-                                $obj2 = new usuariosController();
-                                $reclutadores = $obj2->listarReclutadores();
+                                $sedes = $obj->listarSedes($idusuario, $idrol, $idempresa);
+                                $reclutadores = $obj2->listarReclutadoress();
+
 
                                 $soloRolPermitido = in_array($idrol, [2, 4]); //MODERADOR y ADMIN 
                                 $displayCompleto = $soloRolPermitido ? '' : 'display: none;';
@@ -176,15 +177,11 @@ if (isset($_SESSION['activo'])) {
                                                 <th class="text-center">#</th>
                                                 <th>FECHA REGISTRO</th>
                                                 <th>POSTULANTE</th>
-                                                <th>DOC</th>
                                                 <th>N° DOC.</th>
-                                                <th>EDAD</th>
                                                 <th>TELEFONO</th>
-                                                <th>DISTRITO</th>
-                                                <th>FUENTE</th>
-                                                <th>CONTACTO</th>
+                                                <th>RECLUTADOR</th>
                                                 <th>ESTADO</th>
-                                                <th>DETALLE</th>
+                                                <!-- <th>DETALLE</th><td>${agenda.detalle ? agenda.detalle : "NO DEFINIDO"}</td> -->
                                                 <th>FECHA AGENDA</th>
                                                 <th></th>
                                             </tr>

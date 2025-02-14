@@ -84,5 +84,3 @@
         </div>
     </form>
 </div>
-<!-- VER USUARIO MEDIANTE AJAX -->
-<!-- <script src="../../../public/js/usuarios/ajaxVerUsuario.js"></script> -->

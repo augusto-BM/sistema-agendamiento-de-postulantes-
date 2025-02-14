@@ -4,7 +4,7 @@
 
 /* ===============================================  CONTENDEDOR DE LA TABLA ============================= */
 
-.contenedor-secundario{
+.contenedor-secundario, .modal-contendero-secundario{
     & h4{
         margin-left: 4px;
     }

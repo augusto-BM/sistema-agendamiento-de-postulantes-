@@ -256,4 +256,38 @@ class usuariosModel
 
         return false;
     }
+
+    public function verAgenda($idagenda)
+    {
+        $stament = $this->PDO->prepare("    SELECT 
+                                                a.idagenda as idagenda, a.postulante as postulante, a.tipodocumento as tipodocumento , 
+                                                a.numerodocumento as numerodocumento, a.edad as edad, a.celular as celular, a.celular2 as celular2,
+                                                a.distrito as distrito, a.fuente as fuente, a.contacto as contacto, a.observaciones as observaciones,
+                                                a.agenda as agenda, a.estado as estado, a.estadofinal as estadofinal, a.asistencia as asistencia,
+                                                a.fecharegistro as fecharegistro, a.horaregistro as horaregistro, a.fechaagenda as fechaagenda,
+                                                a.fechareprogramacion as fechareprogramacion, a.turno as turno, a.sede as sede, a.sedeprincipal as sedeprincipal,
+                                                a.idusuario as idusuario, u.nombreusuario as nombreusuario
+                                            FROM agenda a 
+                                            INNER JOIN usuario u ON a.idusuario = u.idusuario
+                                            WHERE a.idagenda = :idagenda limit 1
+                                     ");
+        $stament->bindParam(':idagenda', $idagenda);
+        return ($stament->execute()) ? $stament->fetch(PDO::FETCH_OBJ) : false;
+    }
+
+    public function reclutadoress()
+    {
+        $stament = $this->PDO->prepare(
+            "   SELECT DISTINCT 
+                                                usuario.idusuario, 
+                                                usuario.nombreusuario, 
+                                                usuario.estado 
+                                            FROM usuario 
+                                            INNER JOIN agenda ON usuario.idusuario = agenda.idusuario
+                                            WHERE usuario.estado = 2
+                                            ORDER BY usuario.nombreusuario ASC;
+                                        "
+        );
+        return ($stament->execute()) ? $stament->fetchAll(PDO::FETCH_OBJ) : false;
+    }
 }

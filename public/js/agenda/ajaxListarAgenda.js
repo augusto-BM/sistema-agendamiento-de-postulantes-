@@ -168,26 +168,22 @@ function generarFilaAgenda(agenda, counter) {
   return `
     <tr>
       <td style="display: none;">${agenda.idagenda}</td>
-      <td class="text-center">${counter}</td>
+      <td><i class='fab fa-angular fa-lg me-1'></i>${counter}</td>
       <td>${agenda.fecharegistro}</td>
       <td>${agenda.postulante}</td>
-      <td>${agenda.tipodocumento}</td>
       <td>${agenda.numerodocumento}</td>
-      <td>${agenda.edad}</td>
       <td>${agenda.celular}</td>
-      <td>${agenda.distrito}</td>
-      <td>${agenda.fuente}</td>
       <td>${agenda.nombreusuario}</td>
       <td>${agenda.agenda ? agenda.agenda : "NO DEFINIDO"}</td>
-      <td>${agenda.detalle ? agenda.detalle : "NO DEFINIDO"}</td>
+      
       <td>${agenda.fechaagenda}</td>
       <td>
-        <a href="#" class="btn-ver ms-0 abrirModal" data-id="verAgenda" data-titulo="Ver Agenda" data-prefix="Agenda/" data-identificador="${
+        <a href="#" class="btn-ver ms-0 abrirModal" data-id="verAgendas" data-titulo="Ver Agenda" data-prefix="Agenda/" data-identificador="${
           agenda.idagenda
         }">
           <i class="fa-solid fa-eye fa-lg" title="Ver" style="color: #19727A;"></i>
         </a>
-        <a href="#" class="btn-editar ms-0 abrirModal" data-id="editarAgenda" data-titulo="Editar Agenda" data-prefix="Agenda/" data-identificador="${
+        <a href="#" class="btn-editar ms-0 abrirModal" data-id="editarAgendas" data-titulo="Editar Agenda" data-prefix="Agenda/" data-identificador="${
           agenda.idagenda
         }">
           <i class="fa-solid fa-pen-to-square fa-lg" title="Editar" style="color: #19727A;"></i>

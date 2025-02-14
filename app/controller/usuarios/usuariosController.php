@@ -25,10 +25,6 @@ class usuariosController
         require_once '../../model/usuarios/usuariosModel.php';
         $this->model = new usuariosModel();
     }
-    /* public function mostrarUsuarios(){
-            return ($this->model->usuarios()) ? $this->model->usuarios() : false;
-            } 
-        */
 
     public function listarReclutadores()
     {

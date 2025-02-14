@@ -1,0 +1,30 @@
+#myTablaAgendas{
+    & th:nth-child(2), td:nth-child(2) { /* # */
+        width: 7%;
+    }
+    & th:nth-child(3), td:nth-child(3) { /* FECHA REGISTRO*/
+        width: 12%;
+    }
+    & th:nth-child(4), td:nth-child(4) { /* POSTULANTE */
+        width: 19%;
+    }
+    & th:nth-child(5), td:nth-child(5) { /* N° DOC. */
+        width: 9%;
+    }
+    & th:nth-child(6), td:nth-child(6) { /* TELEFONO */
+        width: 9%;
+    }
+    & th:nth-child(7), td:nth-child(7) { /* RECLUTADOR */
+        width: 19%;
+    }
+    & th:nth-child(8), td:nth-child(8) { /* ESTADO*/
+        width: 10%;
+    }
+    & th:nth-child(9), td:nth-child(9) { /* FECHA AGENDA */
+        width: 12%;
+    }
+    & th:nth-child(10), td:nth-child(10) { /* EDITAR */
+        width: 3%;
+    }
+}
+

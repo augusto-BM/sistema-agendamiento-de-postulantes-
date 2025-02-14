@@ -94,5 +94,16 @@
                 echo json_encode(['error' => 'Hubo un problema al obtener las agendas: ' . $e->getMessage()]);
             }
         }
+
+        public function mostrarAgenda($idagenda)
+        {
+            return ($this->model->verAgenda($idagenda)) ? $this->model->verAgenda($idagenda) : header("Location:agendas.php");
+        }
+
+        public function listarReclutadoress()
+        {
+            $reclutadores = $this->model->reclutadoress();
+            return $reclutadores ? $reclutadores : false;
+        }
     }
 ?>

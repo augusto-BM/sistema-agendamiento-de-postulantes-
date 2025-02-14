@@ -10,19 +10,7 @@ class usuariosModel
         $this->PDO = $con->getConnection();
     }
 
-    /* 
-
-        //LISTAR LOS USUARIOS QUE SE ESTAN FILTRANDO
-        public function buscarUsuarios($query) {
-            $query = "%" . $query . "%";
-            $stament = $this->PDO->prepare("SELECT idusuario, nombreusuario, dni, correo, celular, sede, fechaingreso, estado 
-                                            FROM usuario 
-                                            WHERE (nombreusuario LIKE ? OR dni LIKE ?) AND estado = 2 
-                                            ORDER BY nombreusuario ASC");
-            $stament->execute([$query, $query]);
-            return ($stament->rowCount() > 0) ? $stament->fetchAll(PDO::FETCH_OBJ) : [];
-        } */
-    //LISTAR TODOS LOS USUARIOS
+    //LISTAR TODOS LOS RECLUTADORES
     public function reclutadores()
     {
         $stament = $this->PDO->prepare( "   SELECT DISTINCT 
