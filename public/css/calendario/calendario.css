@@ -12,6 +12,12 @@
 .calendar-container {
   display: inline-block;
   margin-top: 20px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  opacity: 0;
+  animation: fadeIn 1s forwards;
 }
 
 .calendar {
@@ -25,11 +31,16 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #696cff;
+  background-color: rgba(105, 108, 255, 0.16);
+  padding: 15px 10px;
 }
 
 .calendar-header button {
   background-color: #f0f2f4;
-  color: #697a8d;
+  color: #696cff;
   border: 0px solid #d9dee3;
   padding: 8px 12px;
   font-size: 14px;
@@ -40,19 +51,23 @@
 }
 
 .calendar-header button:hover {
-  background-color: #d9dee3;
+  background-color: #f0f0f0;
   border-color: #d9dee3;
 }
 
 .disabled-prev-month {
   cursor: not-allowed !important;
   opacity: 0.7 !important;
+  background-color: #f0f0f0 !important;
 }
 
 .calendar-days {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 5px;
+  gap: 8px;
+  color: #19727A;
+  font-weight: 700;
+
 }
 
 .calendar-day {
@@ -61,7 +76,11 @@
   line-height: 40px;
   border-radius: 50%;
   cursor: pointer;
+  transition: 0.3s;
+  font-weight: 500;
+  font-size: 16px;
   transition: background-color 0.3s, transform 0.3s;
+  color: black;
 }
 
 .calendar-day:hover {
@@ -90,4 +109,12 @@
 .button {
   padding: 5px 15px;
   cursor: pointer;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

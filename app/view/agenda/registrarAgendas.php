@@ -274,7 +274,7 @@ require_once '../../../config/datossesion/datossesion.php'
                 const selectedDateStr = formatearFecha(selectedDate);
 
                 // Comprobar si la fecha seleccionada es un domingo o una fecha no laborable
-                if (selectedDate.getDay() === 0) { // 0 = Domingo
+                if (selectedDate.getDay() === 6) { // 0 = Domingo
                     alert("No se puede seleccionar un domingo. Por favor, elige otro día.");
                     $(this).val(fechaAsignada); // Recuperar la fecha laborable previamente asignada
                 } else if (fechasNoLaborablesSet.has(selectedDateStr)) {

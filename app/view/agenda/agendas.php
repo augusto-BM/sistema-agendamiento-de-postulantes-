@@ -157,7 +157,7 @@ if (isset($_SESSION['activo'])) {
                                                 <button id="btn_buscarAgendaFiltros" class="btn btn-primary btn_buscar"
                                                     style="margin-right: 3px; display: none;">Buscar</button>
                                                 <input class="form-control" type="search" id="buscarSearchData"
-                                                    placeholder="Buscar Postulante, DNI o Celular">
+                                                    placeholder="Buscar Postulante, N° Doc o Telefono">
                                             </div>
                                         </div>
                                     </div>

@@ -30,7 +30,7 @@ function obtenerDiaHoyCalendario() {
 /*** MÓDULO DE ACCESO AL BACKEND ***/
 // Función genérica para enviar datos al backend
 function updateCalendarData(data) {
-  console.log("Enviando datos al servidor:", data); // PUNTO DE DEPURACIÓN
+  //console.log("Enviando datos al servidor:", data); // PUNTO DE DEPURACIÓN
   return $.ajax({
     url: "storeCalendary.php",
     type: "POST",
@@ -50,7 +50,7 @@ function fetchStoredDatesCalendario() {
 
 /*** MÓDULO DE RENDERIZADO DEL CALENDARIO ***/
 async function renderizarCalendario() {
-  console.log("Renderizando calendario...");
+  //console.log("Renderizando calendario...");
 
   const $yearMonth = $("#calendar-year-month");
   const $calendarDays = $("#calendar-days");
@@ -63,7 +63,8 @@ async function renderizarCalendario() {
   const lastDayOfMonth = new Date(year, month + 1, 0);
   const daysInMonth = lastDayOfMonth.getDate();
 
-  $yearMonth.text(`${mesesCalendario[month]} ${year}`);
+  $yearMonth.html(`${mesesCalendario[month]} &nbsp;-&nbsp;&nbsp;${year}`);
+
   $calendarDays.empty();
   diasCalendario.forEach((day) => $calendarDays.append(`<div>${day}</div>`));
 
@@ -74,7 +75,7 @@ async function renderizarCalendario() {
 
   try {
     const response = await fetchStoredDatesCalendario();
-    console.log("Fechas guardadas:", response);
+    //console.log("Fechas guardadas:", response);
     const savedDatesCalendario = limpiarDomingosPasadosEsteMes(response);
 
     for (let i = 1; i <= daysInMonth; i++) {
@@ -100,31 +101,9 @@ async function renderizarCalendario() {
       } else if (date.getDay() === 0) {
         $dayElement.addClass("red disabled");
       } else {
+        // Aquí está la lógica del clic para el día
         $dayElement.on("click", function () {
-          console.log("Clic en el día: ", i);
-          diaSeleccionadoCalendario = $dayElement;
-          const diaSeleccionadoInfo = {
-            year: date.getFullYear(),
-            month: date.getMonth() + 1,
-            day: date.getDate(),
-          };
-
-          const isSelected = $dayElement.hasClass("red");
-          console.log("Estado del día seleccionado (es rojo): ", isSelected);
-
-          updateCalendarData(diaSeleccionadoInfo)
-            .done(function (response) {
-              console.log("Respuesta al guardar fecha:", response);
-              if (isSelected) {
-                $dayElement.removeClass("red");
-              } else {
-                $dayElement.addClass("red");
-              }
-              renderizarCalendario();
-            })
-            .fail(function (xhr, status, error) {
-              console.error("Error al guardar la fecha:", error);
-            });
+          manejarClicDia(i, date, $dayElement);
         });
       }
 
@@ -133,21 +112,51 @@ async function renderizarCalendario() {
   } catch (error) {
     console.error("Error al obtener las fechas guardadas:", error);
   }
-    // Se deshabilita el botón de mes anterior si se está mostrando el mes actual
-    const today = obtenerDiaHoyCalendario();
-    const currentCalendar = new Date(year, month, 1);
-    if (
-      today.getFullYear() === currentCalendar.getFullYear() &&
-      today.getMonth() === currentCalendar.getMonth()
-    ) {
-      $("#prev-month").prop("disabled", true).addClass("disabled-prev-month");
-    } else {
-      $("#prev-month").prop("disabled", false).removeClass("disabled-prev-month");
-    }
+
+  // Se deshabilita el botón de mes anterior si se está mostrando el mes actual
+  const today = obtenerDiaHoyCalendario();
+  const currentCalendar = new Date(year, month, 1);
+  if (
+    today.getFullYear() === currentCalendar.getFullYear() &&
+    today.getMonth() === currentCalendar.getMonth()
+  ) {
+    $("#prev-month").prop("disabled", true).addClass("disabled-prev-month");
+  } else {
+    $("#prev-month").prop("disabled", false).removeClass("disabled-prev-month");
+  }
 }
 
+/*** LÓGICA DEL CLIC EN EL DÍA SEPARADA ***/
+function manejarClicDia(i, date, $dayElement) {
+  //console.log("Clic en el día: ", i);
+  diaSeleccionadoCalendario = $dayElement;
+  const diaSeleccionadoInfo = {
+    year: date.getFullYear(),
+    month: date.getMonth() + 1,
+    day: date.getDate(),
+  };
 
-// Función para cambiar de mes y renderizar nuevamente
+  const isSelected = $dayElement.hasClass("red");
+  //console.log("Estado del día seleccionado (es rojo): ", isSelected);
+
+  updateCalendarData(diaSeleccionadoInfo)
+    .done(function (response) {
+      //console.log("Respuesta al guardar fecha:", response);
+      if (isSelected) {
+        $dayElement.removeClass("red");
+      } else {
+        $dayElement.addClass("red");
+      }
+
+      // Llamar a renderizarCalendario después de modificar el día
+      renderizarCalendario();
+    })
+    .fail(function (xhr, status, error) {
+      console.error("Error al guardar la fecha:", error);
+    });
+}
+
+/*** RENDERIZADO DEL CALENDARIO AL CAMBIAR DE MES ***/
 function cambiarMes(increment) {
   let newMonth = fechaActualCalendario.getMonth() + increment;
   let newYear = fechaActualCalendario.getFullYear();
@@ -163,6 +172,8 @@ function cambiarMes(increment) {
   fechaActualCalendario.setFullYear(newYear);
   fechaActualCalendario.setMonth(newMonth);
   fechaActualCalendario.setDate(1);
+
+  // Aquí solo se llama a renderizarCalendario
   renderizarCalendario();
 }
 
@@ -296,6 +307,8 @@ function validarCalendario() {
 }
 
 $(document).ready(function () {
+  renderizarCalendario();renderizarCalendario();renderizarCalendario();
+  
   validarCalendario()
     .then((validacionExitosa) => {
       if (validacionExitosa) {
@@ -318,6 +331,7 @@ $(document).ready(function () {
           })
           .fail(function (xhr, status, error) {
             console.error("Error al obtener las fechas guardadas:", error);
+            location.reload();
           });
       } else {
         console.log(

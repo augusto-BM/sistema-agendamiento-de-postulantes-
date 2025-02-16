@@ -55,20 +55,19 @@ if (isset($_SESSION['activo'])) {
 
 
                                 <!-- Bootstrap Table with Header - Light -->
-                                <div class="card" style="height: 400px; ">
-                                    <div class="card calendario" style="max-width: 90%; margin: 0 auto; margin-top: 180px;">
+                                <div class="card" style="height: 450px; ">
+                                    <div class="card calendario" style="max-width: 90%; margin: 0 auto; margin-top: 200px;">
                                         <div class="calendar-container" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
                                             <div class="calendar">
                                                 <div class="calendar-header">
-                                                    <button class="button" id="prev-month">←</button>
+                                                    <button class="button" id="prev-month" title="Mes Anterior"><i class="fa-solid fa-arrow-left"></i></button>
                                                     <span id="calendar-year-month"></span>
-                                                    <button class="button" id="next-month">→</button>
+                                                    <button class="button" id="next-month" title="Siguente Mes"><i class="fa-solid fa-arrow-right"></i></button>
                                                 </div>
                                                 <div class="calendar-days" id="calendar-days"></div>
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
                             <!-- / Content -->
