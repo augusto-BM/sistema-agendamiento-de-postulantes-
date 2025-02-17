@@ -10,41 +10,36 @@ class usuariosModel
         $this->PDO = $con->getConnection();
     }
 
-    //LISTAR TODOS LOS RECLUTADORES
-    public function reclutadores()
-    {
-        $stament = $this->PDO->prepare( "   SELECT DISTINCT 
-                                                usuario.idusuario, 
-                                                usuario.nombreusuario, 
-                                                usuario.estado 
-                                            FROM usuario 
-                                            INNER JOIN agenda ON usuario.idusuario = agenda.idusuario
-                                            WHERE usuario.estado = 2
-                                            ORDER BY usuario.nombreusuario ASC;
-                                        "
-        );
-        return ($stament->execute()) ? $stament->fetchAll(PDO::FETCH_OBJ) : false;
-    }
-
-    public function usuarios($idempresa = null, $page = 1, $limit = 10)
+    public function usuarios($idempresa = null, $page = 1, $limit = 50, $query = "")
     {
         $offset = ($page - 1) * $limit;  // Calcular el offset
 
         // Consulta de usuarios
-        $query = "SELECT idusuario, nombreusuario, dni, correo, celular, sede, fechaingreso, estado
-                      FROM usuario WHERE estado = 2";
+        $sqlQuery = "SELECT idusuario, nombreusuario, dni, correo, celular, sede, fechaingreso, estado
+                 FROM usuario WHERE estado = 2";
 
         // Si idempresa es proporcionado, se filtra en la consulta
         if ($idempresa !== null) {
-            $query .= " AND idempresa = :idempresa";
+            $sqlQuery .= " AND idempresa = :idempresa";
+        }
+
+        // Si hay query de búsqueda, agregar el filtro
+        if (!empty($query)) {
+            // Agregar los comodines "%" para hacer una búsqueda parcial
+            $query = "%" . $query . "%";  // Esto se asegura que la búsqueda sea parcial
+            $sqlQuery .= " AND (nombreusuario LIKE :query OR dni LIKE :query)";
         }
 
         // Consulta de COUNT para obtener el total de registros
-        $countQuery = "SELECT COUNT(*) as total
-                           FROM usuario WHERE estado = 2";
+        $countQuery = "SELECT COUNT(*) as total FROM usuario WHERE estado = 2";
 
         if ($idempresa !== null) {
-            $countQuery .= " AND idempresa = :idempresa";  // Aquí también se incluye el filtro de idempresa
+            $countQuery .= " AND idempresa = :idempresa";
+        }
+
+        // Si hay query de búsqueda, agregar el filtro
+        if (!empty($query)) {
+            $countQuery .= " AND (nombreusuario LIKE :query OR dni LIKE :query)";
         }
 
         // Ejecutamos la consulta para contar el total de registros
@@ -52,15 +47,21 @@ class usuariosModel
         if ($idempresa !== null) {
             $stmtCount->bindParam(':idempresa', $idempresa, PDO::PARAM_INT);
         }
+        if (!empty($query)) {
+            $stmtCount->bindParam(':query', $query, PDO::PARAM_STR);
+        }
         $stmtCount->execute();
         $totalRecords = $stmtCount->fetch(PDO::FETCH_OBJ)->total;
 
         // Consulta para obtener los usuarios con LIMIT y OFFSET
-        $query .= " ORDER BY nombreusuario ASC LIMIT :limit OFFSET :offset";
-        $stmt = $this->PDO->prepare($query);
+        $sqlQuery .= " ORDER BY nombreusuario ASC LIMIT :limit OFFSET :offset";
+        $stmt = $this->PDO->prepare($sqlQuery);
 
         if ($idempresa !== null) {
             $stmt->bindParam(':idempresa', $idempresa, PDO::PARAM_INT);
+        }
+        if (!empty($query)) {
+            $stmt->bindParam(':query', $query, PDO::PARAM_STR);
         }
         $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
         $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
@@ -68,55 +69,6 @@ class usuariosModel
         if ($stmt->execute()) {
             $data = $stmt->fetchAll(PDO::FETCH_OBJ);
             return ['users' => $data, 'total' => $totalRecords];
-        }
-
-        return false;
-    }
-
-    public function buscarUsuarios($query, $idempresa = null, $page = 1, $limit = 10)
-    {
-        $query = "%" . $query . "%";
-        $offset = ($page - 1) * $limit;
-
-        // Consulta de búsqueda de usuarios
-        $sql = "SELECT idusuario, nombreusuario, dni, correo, celular, sede, fechaingreso, estado
-                    FROM usuario WHERE (nombreusuario LIKE :query OR dni LIKE :query) AND estado = 2";
-
-        if ($idempresa !== null) {
-            $sql .= " AND idempresa = :idempresa";  // Filtro de idempresa en la búsqueda
-        }
-
-        // Consulta de COUNT para obtener el total de resultados
-        $countQuery = "SELECT COUNT(*) as total
-                           FROM usuario WHERE (nombreusuario LIKE :query OR dni LIKE :query) AND estado = 2";
-
-        if ($idempresa !== null) {
-            $countQuery .= " AND idempresa = :idempresa";  // Aquí también se incluye el filtro de idempresa
-        }
-
-        // Ejecutamos la consulta para contar el total de registros
-        $stmtCount = $this->PDO->prepare($countQuery);
-        $stmtCount->bindParam(':query', $query, PDO::PARAM_STR);
-        if ($idempresa !== null) {
-            $stmtCount->bindParam(':idempresa', $idempresa, PDO::PARAM_INT);
-        }
-        $stmtCount->execute();
-        $totalRecords = $stmtCount->fetch(PDO::FETCH_OBJ)->total;
-
-        // Consulta para obtener los usuarios con LIMIT y OFFSET
-        $sql .= " ORDER BY nombreusuario ASC LIMIT :limit OFFSET :offset";
-        $stmt = $this->PDO->prepare($sql);
-        $stmt->bindParam(':query', $query, PDO::PARAM_STR);
-
-        if ($idempresa !== null) {
-            $stmt->bindParam(':idempresa', $idempresa, PDO::PARAM_INT);
-        }
-        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-        $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
-
-        if ($stmt->execute()) {
-            $data = $stmt->fetchAll(PDO::FETCH_OBJ);
-            return ['users' => $data, 'total' => $totalRecords];  // Devolver los usuarios y el total de registros
         }
 
         return false;
@@ -228,26 +180,36 @@ class usuariosModel
         return ($stament->execute()) ? $idusuario : false;
     }
 
-
-    public function usuariosInactivos($idempresa = null, $page = 1, $limit = 10)
+    public function usuariosInactivos($idempresa = null, $page = 1, $limit = 50, $query = "")
     {
         $offset = ($page - 1) * $limit;  // Calcular el offset
 
         // Consulta de usuarios
-        $query = "SELECT idusuario, nombreusuario, dni, correo, celular, sede, fechaingreso, estado
-                          FROM usuario WHERE estado = 3";
+        $sqlQuery = "SELECT idusuario, nombreusuario, dni, correo, celular, sede, fechaingreso, estado
+                 FROM usuario WHERE estado = 3";
 
         // Si idempresa es proporcionado, se filtra en la consulta
         if ($idempresa !== null) {
-            $query .= " AND idempresa = :idempresa";
+            $sqlQuery .= " AND idempresa = :idempresa";
+        }
+
+        // Si hay query de búsqueda, agregar el filtro
+        if (!empty($query)) {
+            // Agregar los comodines "%" para hacer una búsqueda parcial
+            $query = "%" . $query . "%";  // Esto se asegura que la búsqueda sea parcial
+            $sqlQuery .= " AND (nombreusuario LIKE :query OR dni LIKE :query)";
         }
 
         // Consulta de COUNT para obtener el total de registros
-        $countQuery = "SELECT COUNT(*) as total
-                               FROM usuario WHERE estado = 3";
+        $countQuery = "SELECT COUNT(*) as total FROM usuario WHERE estado = 3";
 
         if ($idempresa !== null) {
-            $countQuery .= " AND idempresa = :idempresa";  // Aquí también se incluye el filtro de idempresa
+            $countQuery .= " AND idempresa = :idempresa";
+        }
+
+        // Si hay query de búsqueda, agregar el filtro
+        if (!empty($query)) {
+            $countQuery .= " AND (nombreusuario LIKE :query OR dni LIKE :query)";
         }
 
         // Ejecutamos la consulta para contar el total de registros
@@ -255,15 +217,21 @@ class usuariosModel
         if ($idempresa !== null) {
             $stmtCount->bindParam(':idempresa', $idempresa, PDO::PARAM_INT);
         }
+        if (!empty($query)) {
+            $stmtCount->bindParam(':query', $query, PDO::PARAM_STR);
+        }
         $stmtCount->execute();
         $totalRecords = $stmtCount->fetch(PDO::FETCH_OBJ)->total;
 
         // Consulta para obtener los usuarios con LIMIT y OFFSET
-        $query .= " ORDER BY nombreusuario ASC LIMIT :limit OFFSET :offset";
-        $stmt = $this->PDO->prepare($query);
+        $sqlQuery .= " ORDER BY nombreusuario ASC LIMIT :limit OFFSET :offset";
+        $stmt = $this->PDO->prepare($sqlQuery);
 
         if ($idempresa !== null) {
             $stmt->bindParam(':idempresa', $idempresa, PDO::PARAM_INT);
+        }
+        if (!empty($query)) {
+            $stmt->bindParam(':query', $query, PDO::PARAM_STR);
         }
         $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
         $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
@@ -275,56 +243,6 @@ class usuariosModel
 
         return false;
     }
-
-    public function buscarUsuariosInactivos($query, $idempresa = null, $page = 1, $limit = 10)
-    {
-        $query = "%" . $query . "%";
-        $offset = ($page - 1) * $limit;
-
-        // Consulta de búsqueda de usuarios
-        $sql = "SELECT idusuario, nombreusuario, dni, correo, celular, sede, fechaingreso, estado
-                    FROM usuario WHERE (nombreusuario LIKE :query OR dni LIKE :query) AND estado = 3";
-
-        if ($idempresa !== null) {
-            $sql .= " AND idempresa = :idempresa";  // Filtro de idempresa en la búsqueda
-        }
-
-        // Consulta de COUNT para obtener el total de resultados
-        $countQuery = "SELECT COUNT(*) as total
-                           FROM usuario WHERE (nombreusuario LIKE :query OR dni LIKE :query) AND estado = 3";
-
-        if ($idempresa !== null) {
-            $countQuery .= " AND idempresa = :idempresa";  // Aquí también se incluye el filtro de idempresa
-        }
-
-        // Ejecutamos la consulta para contar el total de registros
-        $stmtCount = $this->PDO->prepare($countQuery);
-        $stmtCount->bindParam(':query', $query, PDO::PARAM_STR);
-        if ($idempresa !== null) {
-            $stmtCount->bindParam(':idempresa', $idempresa, PDO::PARAM_INT);
-        }
-        $stmtCount->execute();
-        $totalRecords = $stmtCount->fetch(PDO::FETCH_OBJ)->total;
-
-        // Consulta para obtener los usuarios con LIMIT y OFFSET
-        $sql .= " ORDER BY nombreusuario ASC LIMIT :limit OFFSET :offset";
-        $stmt = $this->PDO->prepare($sql);
-        $stmt->bindParam(':query', $query, PDO::PARAM_STR);
-
-        if ($idempresa !== null) {
-            $stmt->bindParam(':idempresa', $idempresa, PDO::PARAM_INT);
-        }
-        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-        $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
-
-        if ($stmt->execute()) {
-            $data = $stmt->fetchAll(PDO::FETCH_OBJ);
-            return ['users' => $data, 'total' => $totalRecords];  // Devolver los usuarios y el total de registros
-        }
-
-        return false;
-    }
-
     /* public function delete($id){
         $stament = $this->PDO->prepare("DELETE FROM username WHERE id = :id");
         $stament->bindParam(':id', $id);

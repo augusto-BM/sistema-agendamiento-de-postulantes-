@@ -106,7 +106,7 @@ if (isset($_SESSION['activo'])) {
                                                 <button id="btnBuscarSearchData" class="btn btn-primary btn_buscar"
                                                     style="margin-right: 3px; display: none;">Buscar</button>
                                                 <input class="form-control" type="search" id="buscarSearchData"
-                                                    placeholder="Buscar colaborador por Nombre, DNI">
+                                                    placeholder="Buscar por colaborador o DNI">
                                             </div>
                                         </div>
                                     </div>

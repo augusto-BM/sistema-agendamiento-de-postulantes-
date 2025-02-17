@@ -238,48 +238,62 @@ require_once '../../../config/datossesion/datossesion.php'
         let fechaAsignada; // Variable para almacenar la fecha asignada inicialmente
 
         try {
-            // Realizar una solicitud AJAX para cargar el archivo fechasCalendario.json
+            // Cargar las fechas no laborables desde el archivo JSON
             const fechasNoLaborables = await obtenerFechasNoLaborables();
+            //console.log("Fechas no laborables cargadas:", fechasNoLaborables);
 
-            // Obtener la fecha de Lima
+            // Obtener la fecha actual en Lima
             const fechaLima = obtenerFechaLima();
-            let manana = new Date(fechaLima);
-            manana.setDate(fechaLima.getDate() + 1);
-            const mananaStr = formatearFecha(manana); // Fecha de mañana en formato 'YYYY-MM-DD'
 
-            // Crear un Set para las fechas no laborables
+            //console.log("Fecha actual en Lima:", fechaLima);
+
+            // Crear una nueva fecha de mañana tomando solo el día
+            let manana = new Date(fechaLima);
+            manana.setHours(0, 0, 0, 0); // Asegurarse de que no tenga hora, minuto, etc.
+            manana.setDate(manana.getDate() + 1); // Sumar un día
+            const mananaStr = formatearFecha(manana); // Fecha de mañana en formato 'YYYY-MM-DD'
+            //console.log("Fecha de mañana:", mananaStr);
+
+            // Crear un Set con las fechas no laborables
             const fechasNoLaborablesSet = new Set(
-                fechasNoLaborables.map(function(fecha) {
-                    return formatearFecha(new Date(fecha.year, fecha.month - 1, fecha.day));
-                })
+                fechasNoLaborables.map(fecha => formatearFecha(new Date(fecha.year, fecha.month - 1, fecha.day)))
             );
+            //console.log("Conjunto de fechas no laborables:", [...fechasNoLaborablesSet]);
 
             // Verificar si la fecha de mañana está en el Set de fechas no laborables
             if (!fechasNoLaborablesSet.has(mananaStr)) {
-                fechaAsignada = mananaStr; // Guardar la fecha asignada
+                //console.log("La fecha de mañana no es laborable.");
+                fechaAsignada = mananaStr;
                 $("#fecha_agenda").val(mananaStr);
             } else {
+                //console.log("La fecha de mañana es no laborable. Buscando siguiente día laborable.");
+                // Buscar la siguiente fecha laborable
                 const siguienteLaborable = getSiguienteLaborable(manana, fechasNoLaborablesSet);
                 const siguienteLaborableStr = formatearFecha(siguienteLaborable);
-                fechaAsignada = siguienteLaborableStr; // Guardar la fecha asignada
+                //console.log("Siguiente fecha laborable:", siguienteLaborableStr);
+                fechaAsignada = siguienteLaborableStr;
                 $("#fecha_agenda").val(siguienteLaborableStr);
             }
 
-            // Establecer la fecha mínima del input
+            // Establecer la fecha mínima para el input de fecha
+            //console.log("Estableciendo la fecha mínima para el input de fecha:", mananaStr);
             $("#fecha_agenda").attr("min", mananaStr);
 
             // Validación al cambiar la fecha
             $("#fecha_agenda").on('change', function() {
                 const selectedDate = new Date($(this).val());
                 const selectedDateStr = formatearFecha(selectedDate);
+                //console.log("Fecha seleccionada por el usuario:", selectedDateStr);
 
-                // Comprobar si la fecha seleccionada es un domingo o una fecha no laborable
-                if (selectedDate.getDay() === 6) { // 0 = Domingo
+                // Validar si el día seleccionado es domingo o no laborable
+                if (selectedDate.getDay() === 6) { // 6 = Domingo
+                    //console.log("El día seleccionado es domingo.");
                     alert("No se puede seleccionar un domingo. Por favor, elige otro día.");
-                    $(this).val(fechaAsignada); // Recuperar la fecha laborable previamente asignada
+                    $(this).val(fechaAsignada); // Restaurar la fecha previamente asignada
                 } else if (fechasNoLaborablesSet.has(selectedDateStr)) {
+                    //console.log("El día seleccionado es no laborable.");
                     alert("El día seleccionado es no laborable. Por favor, elige otro día.");
-                    $(this).val(fechaAsignada); // Recuperar la fecha laborable previamente asignada
+                    $(this).val(fechaAsignada); // Restaurar la fecha previamente asignada
                 }
             });
 
@@ -290,26 +304,34 @@ require_once '../../../config/datossesion/datossesion.php'
         // Función asíncrona para obtener las fechas no laborables
         async function obtenerFechasNoLaborables() {
             try {
+                //console.log("Realizando la solicitud AJAX para obtener las fechas no laborables...");
                 const response = await $.ajax({
                     url: "../calendario/fechasCalendario.json", // Ruta al archivo JSON
                     type: "GET",
                     dataType: "json"
                 });
+                //console.log("Fechas no laborables obtenidas:", response);
                 return response; // Devuelve las fechas no laborables
             } catch (error) {
-                throw new Error("Error al cargar las fechas no laborables: " + error);
+                console.error("Error al obtener las fechas no laborables: ", error);
+                throw new Error("No se pudo cargar el archivo de fechas no laborables");
             }
         }
 
         // Función para obtener el siguiente día laborable
         function getSiguienteLaborable(fechaInicio, fechasNoLaborablesSet) {
             let siguienteFecha = new Date(fechaInicio);
-            while (true) {
-                siguienteFecha.setDate(siguienteFecha.getDate() + 1);
-                const siguienteFechaStr = formatearFecha(siguienteFecha);
+            //console.log("Buscando el siguiente día laborable a partir de:", formatearFecha(siguienteFecha));
 
-                // Comprobar si la siguiente fecha no está en el Set y no es domingo
+            // Avanzar al siguiente día y verificar si es laborable (si no es domingo y no es una fecha no laborable)
+            while (true) {
+                siguienteFecha.setDate(siguienteFecha.getDate() + 1); // Avanzar al siguiente día
+                const siguienteFechaStr = formatearFecha(siguienteFecha);
+                //console.log("Comprobando fecha:", siguienteFechaStr);
+
+                // Verificar si la fecha no es no laborable y no es domingo
                 if (!fechasNoLaborablesSet.has(siguienteFechaStr) && siguienteFecha.getDay() !== 0) {
+                    //console.log("Encontrada siguiente fecha laborable:", siguienteFechaStr);
                     return siguienteFecha;
                 }
             }
@@ -317,46 +339,3 @@ require_once '../../../config/datossesion/datossesion.php'
     });
 </script>
 
-
-
-
-<!-- SCRIPT PARA VALIDAR EL INPUT DE AGENDAR FECHA -->
-<!-- <script>
-    // Guardamos el valor inicial del campo de fecha
-    const fechaInputAgenda = document.getElementById('fecha_agenda');
-    let initialValue = fechaInputAgenda.value;
-
-    // Escuchar cuando el valor del campo cambia
-    fechaInputAgenda.addEventListener('change', function(event) {
-        // Mostrar el valor seleccionado para verificar la entrada
-        console.log("Fecha seleccionada: ", event.target.value);
-
-        // Crear una fecha con la zona horaria UTC para evitar desplazamientos por zona horaria
-        const selectedDate = new Date(event.target.value + "T00:00:00Z");
-        
-        // Obtener la fecha de hoy
-        const today = new Date();
-        today.setHours(0, 0, 0, 0); // Aseguramos que solo compare la fecha sin la hora
-
-        // Mostrar la fecha en formato de día de la semana
-        console.log("Día de la semana (0=Domingo, 6=Sábado): ", selectedDate.getUTCDay());
-
-        // Verificar si el día de la semana es domingo (0 es domingo)
-        if (selectedDate.getUTCDay() === 0) {
-            alert("No puedes seleccionar un domingo.");
-            // Restauramos el valor original del input si es domingo
-            event.target.value = initialValue;
-        }
-        // Verificar si la fecha seleccionada es anterior al día de hoy
-        else if (selectedDate < today) {
-            alert("No puedes seleccionar una fecha anterior al día de hoy.");
-            // Restauramos el valor original del input si es fecha anterior a hoy
-            event.target.value = initialValue;
-        }
-    });
-
-    // Para manejar el caso de que el valor inicial se modifique fuera del evento (por ejemplo, con un valor predeterminado)
-    fechaInputAgenda.addEventListener('focus', function() {
-        initialValue = fechaInputAgenda.value;
-    });
-</script> -->

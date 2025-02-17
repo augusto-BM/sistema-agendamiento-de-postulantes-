@@ -1,4 +1,5 @@
 // Función para mostrar las alertas (SweetAlert o alert estándar)
+//console.log("ajaxActualizarEstado.js");
 function mostrarAlertaEstado(titulo, texto, tipo) {
   if (typeof Swal !== 'undefined') {
     Swal.fire({
@@ -67,13 +68,13 @@ async function cambiarEstadoUsuario(usuario_id, nuevoEstado) {
     }
 
     // Cargar usuarios inactivos si la función existe
-    if (typeof cargarUsuariosInactivos === 'function') {
-      cargarUsuariosInactivos(sedeSeleccionadaInactivos, page, limitinactivos);
+    if (typeof cargarUsuariosDesactivos === 'function') {
+      cargarUsuariosDesactivos();
     }
 
     // Cargar usuarios activos si la función existe
     if (typeof cargarUsuarios === 'function') {
-      cargarUsuarios($("#filtroSedes").val(), page, limit);
+      cargarUsuarios();
     }
 
   } catch (error) {

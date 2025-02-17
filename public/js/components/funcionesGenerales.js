@@ -40,18 +40,19 @@ function validarCampo(selector, regex, errorMessage) {
 
 // Función para obtener la fecha actual de Lima
 function obtenerFechaLima() {
-  const options = {
-    timeZone: "America/Lima",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  };
-  const fechaLima = new Intl.DateTimeFormat("es-PE", options).format(
-    new Date()
-  );
-  const [day, month, year] = fechaLima.split("/");
-  return new Date(`${year}-${month}-${day}`); // Devolver como un objeto Date
+  const fechaLima = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Lima" }));
+
+  if (!(fechaLima instanceof Date) || isNaN(fechaLima)) {
+    console.error("Error: fechaLima no es un objeto Date válido");
+    return null;  
+  }
+  
+  return fechaLima;  
 }
+
+/* function obtenerHoraLima() {
+  return new Date(new Date().toLocaleString("en-US", { timeZone: "America/Lima" }));
+} */
 
 // Función para formatear la fecha en formato YYYY-MM-DD
 function formatearFecha(fecha) {

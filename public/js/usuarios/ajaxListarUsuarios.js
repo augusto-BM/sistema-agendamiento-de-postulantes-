@@ -3,21 +3,152 @@ var sedeSeleccionada = $("#filtroSedes").val();
 var page = 1;
 var limit = 50;
 var totalRecords = 0;
+var searchQuery = $("#buscarSearchData").val();
 
-// Modificar el código donde se genera el botón de estado en la fila
+// Función para actualizar la paginación
+function actualizarPaginacion() {
+  const totalPages = Math.ceil(totalRecords / limit);
+  let paginationHtml = "";
+
+  const maxVisiblePages = 5; // Número de páginas visibles antes de los puntos suspensivos
+
+  // Mostrar botón de "Inicio"
+  if (page > 1) {
+    paginationHtml += `
+      <li class="page-item">
+        <button class="btn page-link" data-page="1">Inicio</button>
+      </li>
+    `;
+  }
+
+  // Mostrar las primeras páginas
+  const startPage = Math.max(page - Math.floor(maxVisiblePages / 2), 1);
+  const endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
+
+  // Si la página de inicio no es la primera página, mostrar "..." antes de las páginas
+  if (startPage > 1) {
+    paginationHtml += `
+      <li class="page-item">
+        <button class="btn page-link" data-page="${1}">1</button>
+      </li>
+      <li class="page-item disabled">
+        <span class="page-link">...</span>
+      </li>
+    `;
+  }
+
+  // Páginas del medio
+  for (let i = startPage; i <= endPage; i++) {
+    paginationHtml += `
+      <li class="page-item">
+        <button class="btn page-link" data-page="${i}">${i}</button>
+      </li>
+    `;
+  }
+
+  // Si la página final no es la última página, mostrar "..." después de las páginas
+  if (endPage < totalPages) {
+    paginationHtml += `
+      <li class="page-item disabled">
+        <span class="page-link">...</span>
+      </li>
+      <li class="page-item">
+        <button class="btn page-link" data-page="${totalPages}">${totalPages}</button>
+      </li>
+    `;
+  }
+
+  // Mostrar botón de "Fin"
+  if (page < totalPages) {
+    paginationHtml += `
+      <li class="page-item">
+        <button class="btn page-link" data-page="${totalPages}">Fin</button>
+      </li>
+    `;
+  }
+
+  // Insertar la paginación generada en el contenedor
+  $("#pagination").html(paginationHtml);
+
+  // Marcar la página actual como activa
+  $(".page-item").removeClass("active");
+  $('.page-item button[data-page="' + page + '"]')
+    .closest("li")
+    .addClass("active");
+}
+
+// Delegación de evento para paginación
+$("#pagination").on("click", ".page-item button", function () {
+  page = $(this).data("page");
+  cargarUsuarios();
+});
+
+// Delegación de evento para paginación
+$("#pagination").on("click", ".page-item button", function () {
+  page = $(this).data("page");
+  //console.log("Página seleccionada:", page);
+  cargarUsuarios();
+});
+
+let ajaxRequest;
+async function cargarUsuarios() {
+  sedeSeleccionada = $("#filtroSedes").val();
+  searchQuery = $("#buscarSearchData").val();
+
+  const dataToSend = {
+    sedeSeleccionada,
+    searchQuery,
+    page,
+    limit,
+  };
+
+    //console.log("Datos a enviar:", dataToSend);
+
+  // Cancelar la petición AJAX anterior si existe
+  if (ajaxRequest) {
+    ajaxRequest.abort();
+  }
+
+  try {
+    ajaxRequest = $.ajax({
+      url: "../../controller/usuarios/usuariosController.php?accion=mostrarUsuariosAjax",
+      method: "GET",
+      data: dataToSend,
+    });
+
+    const response = await ajaxRequest;
+    //console.log("Respuesta del servidor:", response);
+
+    if (response && response.users) {
+      const tbody = $("#data-body");
+      tbody.empty(); // Limpiar datos previos
+      let resultadoCount = $("#resultadoCount");
+      let counter = (page - 1) * limit + 1;
+
+      response.users.forEach((user) => {
+        tbody.append(generarFilaUsuario(user, counter));
+        counter++;
+      });
+
+      totalRecords = response.total;
+
+      let textoBusqueda = searchQuery? ` para "${searchQuery}"` : "";
+      resultadoCount.text(
+        `Se encontró ${totalRecords} resultados${textoBusqueda}`
+      );
+      actualizarPaginacion();
+    } else {
+      $("#resultadoCount").text("Se encontró 0 resultados");
+    }
+  } catch (error) {
+    console.error("Error al cargar los usuarios:", error);
+  }
+}
+
+ // Modificar el código donde se genera el botón de estado en la fila
 function generarFilaUsuario(usuario, counter) {
-  const estadoClase =
-    usuario.estado === 2
-      ? "success"
-      : usuario.estado === 3
-      ? "danger"
-      : "secondary";
-  const estadoTexto =
-    usuario.estado === 2
-      ? "ACTIVO"
-      : usuario.estado === 3
-      ? "INACTIVO"
-      : "DESCONOCIDO";
+  const estadoClase = usuario.estado === 2 ? "success" : usuario.estado === 3 ? "danger" : "secondary";
+  const estadoTexto = usuario.estado === 2 ? "ACTIVO" : usuario.estado === 3 ? "INACTIVO" : "DESCONOCIDO";
   return `
       <tr class='bg-white align-middle text-center'>
         <td class='usuario_id' style='display: none;'>${usuario.idusuario}</td>
@@ -45,130 +176,37 @@ function generarFilaUsuario(usuario, counter) {
     `;
 }
 
-// Función para cargar usuarios o buscar según query
-async function cargarUsuarios(sedeId, page, limit, query = "") {
-  const url = query
-    ? "../../controller/usuarios/usuariosController.php?accion=buscarUsuariosAjax"
-    : "../../controller/usuarios/usuariosController.php?accion=mostrarUsuariosAjax";
-
-  try {
-    // Realizar la solicitud con fetch
-    const response = await fetch(
-      `${url}&query=${query}&idempresa=${sedeId}&page=${page}&limit=${limit}`
-    );
-
-    // Verificar si la respuesta fue exitosa
-    if (!response.ok) {
-      throw new Error("Error en la solicitud");
-    }
-
-    const data = await response.json(); // Parseamos la respuesta como JSON
-
-    let tableBody = $("#data-body");
-    tableBody.empty();
-    let resultadoCount = $("#resultadoCount");
-    let busquedaRealizadaUsuarios = $("#busquedaRealizadaUsuarios");
-
-    if (Array.isArray(data.users) && data.users.length > 0) {
-      let counter = (page - 1) * limit + 1;
-
-      data.users.forEach(function (usuario) {
-        tableBody.append(generarFilaUsuario(usuario, counter));
-        counter++;
-      });
-
-      totalRecords = data.total;
-      resultadoCount.text(
-        query
-          ? `Se encontró ${totalRecords} resultados de "${query}"`
-          : `Se encontró ${totalRecords} resultados`
-      );
-      busquedaRealizadaUsuarios.text(
-        query ? `Resultados de búsqueda para "${query}"` : ""
-      );
-      actualizarPaginacion();
-    } else {
-      tableBody.append(
-        '<tr><td colspan="9" class="text-center">No se encontraron resultados.</td></tr>'
-      );
-      resultadoCount.text(
-        query
-          ? `Se encontró 0 resultados de "${query}"`
-          : "Se encontró 0 resultados"
-      );
-      busquedaRealizadaUsuarios.text(
-        query ? `No se encontraron resultados para "${query}"` : ""
-      );
-    }
-  } catch (error) {
-    console.error("Error en la solicitud:", error);
-    alert("Hubo un error al listar los datos del usuario.");
-  }
-}
-
-// Función para actualizar la paginación
-function actualizarPaginacion() {
-  const totalPages = Math.ceil(totalRecords / limit);
-  let paginationHtml = "";
-
-  for (let i = 1; i <= totalPages; i++) {
-    paginationHtml += `
-        <li class="page-item">
-            <button class="btn page-link" data-page="${i}">${i}</button>
-        </li>
-      `;
-  }
-
-  $("#pagination").html(paginationHtml);
-  $(".page-item").removeClass("active");
-  $('.page-item button[data-page="' + page + '"]')
-    .closest("li")
-    .addClass("active");
-
-  $(".page-item button").on("click", function () {
-    page = $(this).data("page");
-    manejarBusquedaYCargaUsuarios();
-  });
-}
-
-// Función para manejar la búsqueda y carga de usuarios
-function manejarBusquedaYCargaUsuarios() {
-  const searchQuery = $("#buscarSearchData").val().trim();
-  const sedeId = $("#filtroSedes").val();
-  if (searchQuery.length > 0) {
-    cargarUsuarios(sedeId, page, limit, searchQuery);
-  } else {
-    cargarUsuarios(sedeId, page, limit);
-  }
-}
-
-// Función para manejar el cambio en el filtro de sede
-function handleSedeChange() {
-  page = 1;
-  manejarBusquedaYCargaUsuarios();
-}
-
-// Función para manejar la búsqueda de usuarios
-function handleSearchInput() {
-  const searchText = $(this).val().trim();
-  if (searchText.length > 0) {
-    $("#btnBuscarSearchData").show();
-  } else {
-    $("#btnBuscarSearchData").hide();
-    manejarBusquedaYCargaUsuarios();
-  }
-}
-
-// Función para manejar la acción del botón de búsqueda
-function handleSearchButtonClick() {
-  manejarBusquedaYCargaUsuarios();
-}
-
 // Llamar a las funciones dentro de document.ready
 $(document).ready(function () {
-  cargarUsuarios(sedeSeleccionada, page, limit);
-  // Eventos de búsqueda y filtros
-  $("#buscarSearchData").on("input", handleSearchInput);
-  $("#btnBuscarSearchData").on("click", handleSearchButtonClick);
-  $("#filtroSedes").on("change", handleSedeChange);
+  let hasTextInputSearchUsuario= false;
+
+  $("#filtroSedes").on("change", function () {
+    page = 1; // Resetea la página a 1
+    cargarUsuarios();
+  });
+
+  // Mostrar u ocultar el botón de búsqueda de colaboradores en función del texto
+  $("#buscarSearchData").on("input", function () {
+    const inputValue = $(this).val().trim();
+
+    if (inputValue !== "") {
+      $("#btnBuscarSearchData").show();
+      hasTextInputSearchUsuario = true;
+    } else {
+      $("#btnBuscarSearchData").hide();
+      if (hasTextInputSearchUsuario) {
+        page = 1;
+        cargarUsuarios();
+      }
+    }
+  });
+
+    // Detectar clic en el botón de búsqueda por fecha
+    $("#btnBuscarSearchData").on("click", function () {
+      page = 1;
+      cargarUsuarios();
+      $("#btnBuscarSearchData").hide();
+    });
+  cargarUsuarios();
+
 });
