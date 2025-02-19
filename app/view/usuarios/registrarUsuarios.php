@@ -96,7 +96,7 @@ require_once '../../../config/datossesion/datossesion.php'
                         </select>
                         <div class="invalid-feedback">Este campo es obligatorio.</div>
                     </div>
-                    <input type="hidden" id="nombre_sede" name="nombre_sede">
+                    <input type="text" id="nombre_sede" name="nombre_sede">
 
                     <div class="col-md-4">
                         <label for="turno" class="form-label">TURNO <span class="asterisco"
@@ -277,11 +277,25 @@ require_once '../../../config/datossesion/datossesion.php'
                 if (response && response.success) {
                     mostrarAlertaRegistrar("success", "¡Éxito!", response.message);
                 } else {
-                    mostrarAlertaRegistrar("error", "Error", response.message);
+                    // Aquí se maneja el error de duplicado
+                    if (response.message) {
+                        response.message.forEach((msg) => {
+                            if (msg.includes("DNI")) {
+                                $("#numero_documento").addClass("is-invalid");
+                                $("#numero_documento").next(".invalid-feedback").text(msg).show();
+                            }
+                            if (msg.includes("celular")) {
+                                $("#celular").addClass("is-invalid");
+                                $("#celular").next(".invalid-feedback").text(msg).show();
+                            }
+                        });
+                    } else {
+                        mostrarAlertaRegistrar("error", "Error", response.message);
+                    }
                 }
 
-                console.log("Cargando usuarios...");
-                cargarUsuarios($("#filtroSedes").val(), page, limit);
+                //console.log("Cargando usuarios...");
+                cargarUsuarios();
             }
         });
     });

@@ -4,7 +4,7 @@ date_default_timezone_set('America/Lima');
 require_once '../../../config/datossesion/datossesion.php'
 ?>
 <div class="container contenedor_registrarArticulo modal-page-registrarArticulo page-1">
-    <form class="formulario_registrarUsuario">
+    <form class="formulario_registrarAgenda">
         <div class="card mb-4">
             <h6 class="mt-3 fw-bold titulo-principal text-start ml-4" style="color: #566a7f; margin-left: 17px;">
                 Datos Personales del Postulante <span class="campo_obligatorio campo_obligatorio">(*) Campo obligatorio</span>
@@ -21,52 +21,41 @@ require_once '../../../config/datossesion/datossesion.php'
             $roles = $obj2->listarRoles();
             ?>
 
+
             <div class="card-body">
                 <div class="row mb-2">
-                    <div class="col-md-6">
-                        <label for="nombre_colaborador" class="form-label">NOMBRES Y APELLIDOS <span class="asterisco"
+                    <input type="hidden" id="idusuario" name="idusuario" value="<?php echo $idusuario; ?>">
+                    <div class="col-md-2">
+                        <label for="celular" class="form-label">CELULAR <span class="asterisco"
                                 title="Campo obligatorio">*</span></label>
-                        <input type="text" id="nombre_colaborador" name="nombre_colaborador" class="form-control"
+                        <div class="input-group input-group-merge">
+                            <span class="input-group-text" style="color: #697a8d; font-size: 10px; padding: 0px 3px;">PE (+51)</span>
+                            <input type="text" id="celular" name="celular" class="form-control" placeholder="999666999"
+                                maxlength="9">
+                            <div class="invalid-feedback">El número de celular debe tener 9 dígitos y solo contener
+                                números.</div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="contacto" class="form-label">CONTACTO</label>
+                        <div class="input-group input-group-merge">
+                            <span class="input-group-text" style="color: #697a8d; font-size: 10px; padding: 0px 3px;">PE (+51)</span>
+                            <input type="text" id="contacto" name="contacto" class="form-control" placeholder="Opcional"
+                                maxlength="9">
+                            <div class="invalid-feedback">El número de contacto debe tener 9 dígitos y solo contener
+                                números.</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="postulante" class="form-label">NOMBRES Y APELLIDOS <span class="asterisco"
+                                title="Campo obligatorio">*</span></label>
+                        <input type="text" id="postulante" name="postulante" class="form-control"
                             placeholder="Nombres y Apellidos">
                         <div class="invalid-feedback">Este campo es obligatorio y no puede contener números.</div>
                     </div>
-                    <div class="col-md-3">
-                        <label for="id_empresa" class="form-label">EMPRESA <span class="asterisco"
-                                title="Campo obligatorio">*</span></label>
-                        <select type="text" id="id_empresa" name="id_empresa" class="form-control" required>
-                            <option value="" disabled selected>SELECCIONE</option>
-                            <?php if ($sedes): ?>
-                                <?php foreach ($sedes as $sede): ?>
-                                    <option value="<?= $sede->idempresa; ?>"
-                                        data-nombresede="<?= $sede->nombresede; ?>"
-                                        data-nombreempresa="<?= $sede->nombreempresa; ?>"
-                                        <?= ($sede->nombreempresa == $nombreempresa) ? 'selected' : ''; ?>>
-                                        <?= $sede->nombreempresa; ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <option value="" disabled>No hay empresas activas</option>
-                            <?php endif; ?>
-                        </select>
-                        <div class="invalid-feedback">Este campo es obligatorio.</div>
-                    </div>
-                    <input type="hidden" id="nombre_sede" name="nombre_sede">
 
-                    <div class="col-md-3">
-                        <label for="turno" class="form-label">TURNO <span class="asterisco"
-                                title="Campo obligatorio">*</span></label>
-                        <select type="text" id="turno" name="turno" class="form-control" required>
-                            <option value="" disabled selected>SELECCIONE</option>
-                            <option value="MANANA">MANANA</option>
-                            <option value="TARDE">TARDE</option>
-                        </select>
-                        <div class="invalid-feedback">Este campo es obligatorio.</div>
-                    </div>
-                </div>
-
-                <div class="row mb-2">
-                    <div class="col-md-3">
-                        <label for="tipo_documento" class="form-label">TIPO DE DOC. <span class="asterisco"
+                    <div class="col-md-2">
+                        <label for="tipo_documento" class="form-label">DOC. IDENTIDAD <span class="asterisco"
                                 title="Campo obligatorio">*</span></label>
                         <select type="text" id="tipo_documento" name="tipo_documento" class="form-control" required>
                             <option value="" disabled selected>SELECCIONE</option>
@@ -77,38 +66,18 @@ require_once '../../../config/datossesion/datossesion.php'
                         <div class="invalid-feedback">Este campo es obligatorio.</div>
                     </div>
 
-                    <div class="col-md-3">
-                        <label for="numero_documento" class="form-label">NUMERO DE DOC. <span class="asterisco"
+                    <div class="col-md-2">
+                        <label for="numero_documento" class="form-label">DNI/C.E/PASAPORTE <span class="asterisco"
                                 title="Campo obligatorio">*</span></label>
                         <input type="text" id="numero_documento" name="numero_documento" class="form-control"
                             placeholder="12345678" maxlength="10">
                         <div class="invalid-feedback">Este campo es obligatorio y debe contener solo números.</div>
                     </div>
-                    <div class="col-md-3">
-                        <label for="celular" class="form-label">CELULAR <span class="asterisco"
-                                title="Campo obligatorio">*</span></label>
-                        <div class="input-group input-group-merge">
-                            <span class="input-group-text" style="color: #697a8d;">PE (+51)</span>
-                            <input type="text" id="celular" name="celular" class="form-control" placeholder="999666999"
-                                maxlength="9">
-                            <div class="invalid-feedback">El número de celular debe tener 9 dígitos y solo contener
-                                números.</div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="contacto" class="form-label">CONTACTO</label>
-                        <div class="input-group input-group-merge">
-                            <span class="input-group-text" style="color: #697a8d;">PE (+51)</span>
-                            <input type="text" id="contacto" name="contacto" class="form-control" placeholder="Campo opcional"
-                                maxlength="9">
-                            <div class="invalid-feedback">El número de contacto debe tener 9 dígitos y solo contener
-                                números.</div>
-                        </div>
-                    </div>
                 </div>
 
-                <div class="row mb-2">
 
+
+                <div class="row mb-2">
                     <div class="col-md-3">
                         <label for="cboedad" class="form-label">EDAD <span class="asterisco"
                                 title="Campo obligatorio">*</span></label>
@@ -201,6 +170,42 @@ require_once '../../../config/datossesion/datossesion.php'
                         <div class="invalid-feedback">Este campo es obligatorio.</div>
                     </div>
                 </div>
+
+                <div class="row mb-2">
+                    <div class="col-md-3">
+                        <label for="turno" class="form-label">TURNO <span class="asterisco"
+                                title="Campo obligatorio">*</span></label>
+                        <select type="text" id="turno" name="turno" class="form-control" required>
+                            <option value="" disabled selected>SELECCIONE</option>
+                            <option value="MANANA">MANANA</option>
+                            <option value="TARDE">TARDE</option>
+                        </select>
+                        <div class="invalid-feedback">Este campo es obligatorio.</div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="id_empresa" class="form-label">EMPRESA <span class="asterisco"
+                                title="Campo obligatorio">*</span></label>
+                        <select type="text" id="id_empresa" name="id_empresa" class="form-control" required>
+                            <option value="" disabled selected>SELECCIONE</option>
+                            <?php if ($sedes): ?>
+                                <?php foreach ($sedes as $sede): ?>
+                                    <option value="<?= $sede->idempresa; ?>"
+                                        data-nombresede="<?= $sede->nombresede; ?>"
+                                        data-nombreempresa="<?= $sede->nombreempresa; ?>"
+                                        <?= ($sede->nombreempresa == $nombreempresa) ? 'selected' : ''; ?>>
+                                        <?= $sede->nombreempresa; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <option value="" disabled>No hay empresas activas</option>
+                            <?php endif; ?>
+                        </select>
+                        <div class="invalid-feedback">Este campo es obligatorio.</div>
+                    </div>
+                    <input type="hidden" id="nombre_sede" name="nombre_sede">
+                </div>
+
                 <div class="row mb-2">
                     <div class="col-md-12">
                         <label for="observaciones" class="form-label">OBSERVACIONES</label>
@@ -339,3 +344,129 @@ require_once '../../../config/datossesion/datossesion.php'
     });
 </script>
 
+<script>
+    //console.log("Script registrar usuarios cargado...");
+
+    // Función para mostrar alertas con SweetAlert2 o alert tradicional
+    function mostrarAlertaAgendar(tipo, titulo, mensaje) {
+        if (typeof Swal !== "undefined") {
+            Swal.fire({
+                icon: tipo,
+                title: titulo,
+                text: mensaje,
+                confirmButtonText: "Aceptar",
+                timer: 1000,
+                timerProgressBar: true,
+                didOpen: () => Swal.showLoading(),
+                willClose: () => {
+                    $(".formulario_registrarAgenda")[0].reset();
+                    $("#modalDinamico").modal("hide");
+                },
+            });
+        } else {
+            alert(mensaje);
+        }
+    }
+
+    // Función para la validación de campo
+    function validarCampo(selector, regex, errorMessage) {
+        const value = $(selector).val().trim();
+        return {
+            isValid: value && (!regex || regex.test(value)),
+            selector: selector,
+            errorMessage: errorMessage,
+        };
+    }
+
+    // Función para enviar los datos del formulario de forma asíncrona
+    async function enviarFormulario(formData) {
+        try {
+            const response = await $.ajax({
+                url: "store.php", // Tu archivo PHP
+                type: "POST",
+                data: formData,
+                dataType: "json",
+            });
+            return response;
+        } catch (error) {
+            console.log("Error en la solicitud AJAX.");
+            console.log("Error:", error);
+            alert("Hubo un error al registrar los datos.");
+        }
+    }
+
+    // Llamar a las funciones dentro de document.ready
+    $(document).ready(function() {
+        // Función para convertir los valores a mayúsculas
+        convertirAMayusculas("#postulante, #observaciones, #numero_documento");
+        prevenirNumeros("#postulante");
+        prevenirLetras("#celular, #contacto, #numero_documento");
+
+        // Validación de formulario
+        $(".formulario_registrarAgenda").submit(async function(event) {
+            event.preventDefault(); // Prevenir el envío tradicional del formulario
+
+            let isValid = true;
+            $(".form-control").removeClass("is-invalid");
+            $(".invalid-feedback").hide();
+
+            // Validación de campos específicos
+            const validaciones = [
+                validarCampo("#postulante", /^[a-zA-Z\s]+$/, "El nombre solo puede contener letras y espacios."),
+                validarCampo("#numero_documento", null, "El numero de documento es obligatorio y debe ser numérico."),
+                validarCampo("#celular", /^[0-9]{9}$/, "El celular debe tener 9 dígitos."),
+                validarCampo("#contacto", /^([0-9]{9})?$/, "El contacto debe tener 9 dígitos."), // Tiene que tener 9 dígitos o ninguno
+            ];
+
+            validaciones.forEach(validation => {
+                if (!validation.isValid) {
+                    isValid = false;
+                    $(validation.selector)
+                        .addClass("is-invalid")
+                        .next(".invalid-feedback")
+                        .text(validation.errorMessage)
+                        .show();
+                }
+            });
+
+            // Validaciones de campos seleccionados
+            const camposRequeridos = ["#tipo_documento", "#empresa_id", "#turno", "#fecha_agenda"];
+            camposRequeridos.forEach((selector) => {
+                if ($(selector).val() === "") {
+                    isValid = false;
+                    $(selector).addClass("is-invalid").next(".invalid-feedback").show();
+                }
+            });
+
+            // Si todo es válido, enviar el formulario
+            if (isValid) {
+                const formData = $(".formulario_registrarAgenda").serialize(); // Serializar los datos del formulario
+
+                const response = await enviarFormulario(formData);
+
+                if (response && response.success) {
+                    mostrarAlertaAgendar("success", "¡Éxito!", response.message);
+                } else {
+                    // Aquí se maneja el error de duplicado
+                    if (response.message) {
+                        response.message.forEach((msg) => {
+                            if (msg.includes("DNI")) {
+                                $("#numero_documento").addClass("is-invalid");
+                                $("#numero_documento").next(".invalid-feedback").text(msg).show();
+                            }
+                            if (msg.includes("celular")) {
+                                $("#celular").addClass("is-invalid");
+                                $("#celular").next(".invalid-feedback").text(msg).show();
+                            }
+                        });
+                    } else {
+                        mostrarAlertaAgendar("error", "Error", response.message);
+                    }
+                }
+
+                //console.log("Cargando agendas...");
+                cargarAgendas();
+            }
+        });
+    });
+</script>

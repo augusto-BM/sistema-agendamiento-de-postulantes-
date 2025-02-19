@@ -27,7 +27,7 @@ $reclutadores = $obj2->listarReclutadoress();
                     <input type="hidden" id="idagenda" value="<?= $identificador ?>">
                     <div class="col-md-4">
                         <label for="postulante" class="form-label ">POSTULANTE <span class="asterisco"
-                        title="Campo obligatorio">*</span></label>
+                                title="Campo obligatorio">*</span></label>
                         <input type="text" id="nombre_colaborador" name="nombre_colaborador" class="form-control " value="<?= $date->postulante; ?>" placeholder="Sin dato">
                     </div>
                     <div class="col-md-3">
@@ -40,7 +40,7 @@ $reclutadores = $obj2->listarReclutadoress();
                     </div>
                     <div class="col-md-2">
                         <label for="estado" class="form-label">TIPO DE DOC. <span class="asterisco"
-                        title="Campo obligatorio">*</span></label>
+                                title="Campo obligatorio">*</span></label>
                         <select type="text" id="tipo_documento" name="tipo_documento" class="form-control" required>
                             <option value="" disabled selected>SELECCIONE</option>
                             <option value="DNI" <?= ($date->tipodocumento == 'DNI') ? 'selected' : ''; ?>>DNI</option>
@@ -50,12 +50,12 @@ $reclutadores = $obj2->listarReclutadoress();
                     </div>
                     <div class="col-md-2">
                         <label for="estado" class="form-label">N° DOC <span class="asterisco"
-                        title="Campo obligatorio">*</span></label>
+                                title="Campo obligatorio">*</span></label>
                         <input type="text" id="estado" name="estado" class="form-control " value="<?= $date->numerodocumento; ?>" placeholder="Sin dato">
                     </div>
                     <div class="col-md-1">
                         <label for="edad" class="form-label">EDAD <span class="asterisco"
-                        title="Campo obligatorio">*</span></label>
+                                title="Campo obligatorio">*</span></label>
                         <select type="text" id="cboedad" name="cboedad" class="form-control" required>
                             <?php
                             for ($edad = 18; $edad <= 50; $edad++) {
@@ -70,7 +70,7 @@ $reclutadores = $obj2->listarReclutadoress();
                 <div class="row mb-2">
                     <div class="col-md-3">
                         <label for="postulante" class="form-label ">DISTRITO <span class="asterisco"
-                        title="Campo obligatorio">*</span></label>
+                                title="Campo obligatorio">*</span></label>
                         <select type="text" id="cbodistrito" name="cbodistrito" class="form-control" required>
                             <option value="" disabled selected>SELECCIONE</option>
                             <option value="ANCON" <?= ($date->distrito == 'ANCON') ? 'selected' : ''; ?>>ANCON</option>
@@ -121,7 +121,7 @@ $reclutadores = $obj2->listarReclutadoress();
                     </div>
                     <div class="col-md-3">
                         <label for="estado" class="form-label">FUENTE <span class="asterisco"
-                        title="Campo obligatorio">*</span></label>
+                                title="Campo obligatorio">*</span></label>
                         <select type="text" id="cbofuente" name="cbofuente" class="form-control" required>
                             <option value="" disabled selected>SELECCIONE</option>
                             <option value="FACEBOOK" <?= ($date->fuente == 'FACEBOOK') ? 'selected' : ''; ?>>FACEBOOK</option>
@@ -136,13 +136,13 @@ $reclutadores = $obj2->listarReclutadoress();
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <label for="estado" class="form-label">FECHA DE AGENDA <span class="asterisco"
-                        title="Campo obligatorio">*</span></label>
-                        <input type="date" id="estado" name="estado" class="form-control " value="<?= $date->fechaagenda; ?>" placeholder="Sin fecha de agenda">
+                        <label for="fecha_agenda" class="form-label">FECHA DE AGENDA <span class="asterisco"
+                                title="Campo obligatorio">*</span></label>
+                        <input type="date" id="fecha_agenda" name="fecha_agenda" class="form-control " value="<?= $date->fechaagenda; ?>" placeholder="Sin fecha de agenda">
                     </div>
                     <div class="col-md-3">
                         <label for="estado" class="form-label">SEDE <span class="asterisco"
-                        title="Campo obligatorio">*</span></label>
+                                title="Campo obligatorio">*</span></label>
                         <select type="text" id="id_empresa" name="id_empresa" class="form-control" required>
                             <option value="" disabled selected>SELECCIONE</option>
                             <?php if ($sedes): ?>
@@ -162,7 +162,7 @@ $reclutadores = $obj2->listarReclutadoress();
 
                     <div class="col-md-2">
                         <label for="postulante" class="form-label ">TURNO <span class="asterisco"
-                        title="Campo obligatorio">*</span></label>
+                                title="Campo obligatorio">*</span></label>
                         <select type="text" id="turno" name="turno" class="form-control" required>
                             <option value="" disabled selected>SELECCIONE</option>
                             <option value="MANANA" <?= ($date->turno == 'MANANA') ? 'selected' : ''; ?>>MANANA</option>
@@ -171,18 +171,18 @@ $reclutadores = $obj2->listarReclutadoress();
                     </div>
                     <div class="col-md-3">
                         <label for="postulante" class="form-label ">ESTADO AGENDA <span class="asterisco"
-                        title="Campo obligatorio">*</span></label>
-                        <select type="text" id="id_empresa" name="id_empresa" class="form-control" required>
-                            <option value="" disabled selected>SELECCIONE</option>  
+                                title="Campo obligatorio">*</span></label>
+                        <select type="text" id="estado_agenda" name="estado_agenda" class="form-control" required>
+                            <option value="" disabled selected>SELECCIONE</option>
                             <option value="AGENDADO" <?= ($date->agenda == 'AGENDADO') ? 'selected' : ''; ?>>AGENDADO</option>
                             <option value="REPROGRAMADO" <?= ($date->agenda == 'REPROGRAMADO') ? 'selected' : ''; ?>>REPROGRAMADO</option>
                         </select>
                     </div>
                     <div class="col-md-3">
                         <label for="edad" class="form-label">ESTADO ACTUAL <span class="asterisco"
-                        title="Campo obligatorio">*</span></label>
-                        <select type="text" id="id_empresa" name="id_empresa" class="form-control" required>
-                            <option value="" disabled selected>SELECCIONE</option>  
+                                title="Campo obligatorio">*</span></label>
+                        <select type="text" id="estado_actual" name="estado_actual" class="form-control" required>
+                            <option value="" disabled selected>SELECCIONE</option>
                             <option value="" <?= ($date->estado == '') ? 'selected' : ''; ?>>NO DEFINIDO</option>
                             <option value="CONFIRMADO" <?= ($date->estado == 'CONFIRMADO') ? 'selected' : ''; ?>>CONFIRMADO</option>
                             <option value="NO RESPONDE" <?= ($date->estado == 'NO RESPONDE') ? 'selected' : ''; ?>>NO RESPONDE</option>
@@ -192,7 +192,7 @@ $reclutadores = $obj2->listarReclutadoress();
                     </div>
                     <div class="col-md-4">
                         <label for="estado" class="form-label">RECLUTADOR <span class="asterisco"
-                        title="Campo obligatorio">*</span></label>
+                                title="Campo obligatorio">*</span></label>
                         <select type="text" id="id_empresa" name="id_empresa" class="form-control" required>
                             <option value="" disabled selected>SELECCIONE</option>
                             <?php if ($reclutadores): ?>
@@ -220,3 +220,13 @@ $reclutadores = $obj2->listarReclutadoress();
         </div>
     </form>
 </div>
+
+<!-- AJAX  -->
+<script>
+    $(document).ready(function() {
+        $('#fecha_agenda').on('change', function() {
+            $('#estado_agenda').val('REPROGRAMADO');
+            $('#estado_agenda').css('pointer-events', 'none');
+        });
+    });
+</script>

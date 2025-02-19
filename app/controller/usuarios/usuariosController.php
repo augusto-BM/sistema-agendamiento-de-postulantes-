@@ -3,7 +3,7 @@
 if (isset($_GET['accion']) && $_GET['accion'] === 'mostrarUsuariosAjax') {
     $usuariosController = new usuariosController();
     $usuariosController->mostrarUsuariosAjax();
-}else if (isset($_GET['accion']) && $_GET['accion'] === 'mostrarUsuariosAjaxDesactivos') {
+} else if (isset($_GET['accion']) && $_GET['accion'] === 'mostrarUsuariosAjaxDesactivos') {
     $usuariosController = new usuariosController();
     $usuariosController->mostrarUsuariosDesactivosAjax();
 }
@@ -42,10 +42,10 @@ class usuariosController
             }
 
             if ($query == "") $query = null;
-    
+
             // Llamar a la función del modelo con el query (vacío o no)
             $result = $this->model->usuarios($idempresa, $page, $limit, $query);
-    
+
             if ($result !== false) {
                 header('Content-Type: application/json');
                 echo json_encode([
@@ -60,7 +60,6 @@ class usuariosController
             echo json_encode(['error' => 'Hubo un problema al obtener los usuarios: ' . $e->getMessage()]);
         }
     }
-    
 
     public function actualizarEstadoUsuario($idusuario, $estado)
     {
@@ -75,13 +74,11 @@ class usuariosController
 
     public function guardarUsuarios($nombreusuario, $tipodocumento, $dni, $correo, $pass, $celular, $sede, $idempresa, $turno, $estado, $idrol, $fechaingreso)
     {
-        $id = $this->model->insertarUsuarios($nombreusuario, $tipodocumento, $dni, $correo, $pass, $celular, $sede, $idempresa, $turno, $estado, $idrol, $fechaingreso);
+        // Llamar al método insertarUsuarios y verificar si ya existe el usuario
+        $response = $this->model->insertarUsuarios($nombreusuario, $tipodocumento, $dni, $correo, $pass, $celular, $sede, $idempresa, $turno, $estado, $idrol, $fechaingreso);
 
-        if ($id != false) {
-            echo json_encode(["success" => true, "message" => "Usuario registrado correctamente"]);
-        } else {
-            echo json_encode(["success" => false, "message" => "Hubo un error al registrar el usuario"]);
-        }
+        // Enviar la respuesta en formato JSON
+        echo json_encode($response);
         exit();
     }
 
@@ -92,13 +89,10 @@ class usuariosController
 
     public function actualizarUsuario($idusuario, $nombreusuario, $tipodocumento, $dni, $correo, $pass, $celular, $idempresa, $turno, $idrol, $fechaingreso)
     {
-        $id = $this->model->editarUsuario($idusuario, $nombreusuario, $tipodocumento, $dni, $correo, $pass, $celular, $idempresa, $turno, $idrol, $fechaingreso);
+        $response = $this->model->editarUsuario($idusuario, $nombreusuario, $tipodocumento, $dni, $correo, $pass, $celular, $idempresa, $turno, $idrol, $fechaingreso);
 
-        if ($id != false) {
-            echo json_encode(["success" => true, "message" => "Usuario actualizado correctamente"]);
-        } else {
-            echo json_encode(["success" => false, "message" => "Hubo un error al actualizar el usuario"]);
-        }
+        // Enviar la respuesta en formato JSON
+        echo json_encode($response);
         exit();
     }
 
@@ -124,10 +118,10 @@ class usuariosController
             }
 
             if ($query == "") $query = null;
-    
+
             // Llamar a la función del modelo con el query (vacío o no)
             $result = $this->model->usuariosInactivos($idempresa, $page, $limit, $query);
-    
+
             if ($result !== false) {
                 header('Content-Type: application/json');
                 echo json_encode([
@@ -142,7 +136,6 @@ class usuariosController
             echo json_encode(['error' => 'Hubo un problema al obtener los usuarios: ' . $e->getMessage()]);
         }
     }
-
 
 
     /* public function eliminar($id){

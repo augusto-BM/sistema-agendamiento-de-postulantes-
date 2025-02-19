@@ -256,11 +256,28 @@ $date = $obj3->mostrarUsuario($identificador);
                     if (data.success) {
                         mostrarAlertaEditar("success", "¡Éxito!", data.message);
                     } else {
-                        mostrarAlertaEditar("error", "Error", data.message);
+                        let errorMessages = data.message; // Array de mensajes de error
+
+                        // Verificar si hay errores específicos y asignarles la clase is-invalid
+                        if (errorMessages && errorMessages.length > 0) {
+                            errorMessages.forEach((msg) => {
+                                if (msg.includes("DNI")) {
+                                    $("#numero_documento").addClass("is-invalid");
+                                    $("#numero_documento").next(".invalid-feedback").text(msg).show();
+                                }
+                                if (msg.includes("celular")) {
+                                    $("#celular").addClass("is-invalid");
+                                    $("#celular").next(".invalid-feedback").text(msg).show();
+                                }
+                            });
+                        } else {
+                            // Si no hay errores de campo, mostrar el mensaje de SweetAlert
+                            mostrarAlertaEditar("error", "Error", data.message);
+                        }
                     }
 
                     // Cargar usuarios después de la edición
-                    cargarUsuarios($("#filtroSedes").val(), page, limit);
+                    cargarUsuarios();
 
                 } catch (error) {
                     console.error("Error en la solicitud:", error);

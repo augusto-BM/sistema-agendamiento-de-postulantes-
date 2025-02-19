@@ -10,6 +10,64 @@ class usuariosModel
         $this->PDO = $con->getConnection();
     }
 
+    public function insertarAgendas($postulante, $tipodocumento, $numerodocumento, $edad, $celular, $celular2, $distrito, $fuente, $contacto, $observaciones, $agenda, $asistencia, $fecharegistro, $horaregistro, $fechaagenda, $turno, $sede, $sedeprincipal, $idusuario)
+    {
+        //Verificar si el DNI o el celular ya existen en la BBDD
+        $queryValidar = $this->PDO->prepare("SELECT numerodocumento, celular FROM agenda WHERE numerodocumento = :numerodocumento OR celular = :celular");
+        $queryValidar->bindParam(':numerodocumento', $numerodocumento);
+        $queryValidar->bindParam(':celular', $celular);
+        $queryValidar->execute();
+        $usuarioExiste = $queryValidar->fetch(PDO::FETCH_ASSOC);
+
+        if ($usuarioExiste) {
+            $errors = [];
+            if ($usuarioExiste['numerodocumento'] == $numerodocumento) {
+                $errors[] = "El DNI ya está registrado.";
+            }
+            if ($usuarioExiste['celular'] == $celular) {
+                $errors[] = "El celular ya está registrado.";
+            }
+            return ["success" => false, "message" => $errors];
+        }
+
+        // Preparamos la consulta SQL para insertar los datos en la tabla
+        $stament = $this->PDO->prepare(
+            "INSERT INTO agenda 
+                (postulante, tipodocumento, numerodocumento, edad, celular, celular2, distrito, fuente, contacto, observaciones, agenda, asistencia, fecharegistro, horaregistro, fechaagenda, turno, sede, sedeprincipal, idusuario) 
+            VALUES 
+                (:postulante, :tipodocumento, :numerodocumento, :edad, :celular, :celular2, :distrito, :fuente, :contacto, :observaciones, :agenda, :asistencia, :fecharegistro, :horaregistro, :fechaagenda, :turno, :sede, :sedeprincipal, :idusuario)"
+        );
+
+
+        // Vínculo de parámetros
+        $stament->bindParam(':postulante', $postulante);
+        $stament->bindParam(':tipodocumento', $tipodocumento);
+        $stament->bindParam(':numerodocumento', $numerodocumento);
+        $stament->bindParam(':edad', $edad);
+        $stament->bindParam(':celular', $celular);
+        $stament->bindParam(':celular2', $celular2);
+        $stament->bindParam(':distrito', $distrito);
+        $stament->bindParam(':fuente', $fuente);
+        $stament->bindParam(':contacto', $contacto);
+        $stament->bindParam(':observaciones', $observaciones);
+        $stament->bindParam(':agenda', $agenda);
+        $stament->bindParam(':asistencia', $asistencia);
+        $stament->bindParam(':fecharegistro', $fecharegistro);
+        $stament->bindParam(':horaregistro', $horaregistro);
+        $stament->bindParam(':fechaagenda', $fechaagenda);
+        $stament->bindParam(':turno', $turno);
+        $stament->bindParam(':sede', $sede);
+        $stament->bindParam(':sedeprincipal', $sedeprincipal);
+        $stament->bindParam(':idusuario', $idusuario);
+
+        // Ejecutar la consulta y retornar el mensaje de éxito o error
+        if ($stament->execute()) {
+            return ["success" => true, "message" => "Usuario registrado correctamente"];
+        } else {
+            return ["success" => false, "message" => "Hubo un error al registrar el usuario"];
+        }
+    }
+
     public function agendas($idrol, $nombreSede = null, $estado = null, $nombreReclutador = null, $query = null, $nombreUsuario = null, $fechaInicio = null, $fechaFin = null, $page = 1, $limit = 50)
     {
         $query = "%" . $query . "%";
@@ -279,14 +337,14 @@ class usuariosModel
     {
         $stament = $this->PDO->prepare(
             "   SELECT DISTINCT 
-                                                usuario.idusuario, 
-                                                usuario.nombreusuario, 
-                                                usuario.estado 
-                                            FROM usuario 
-                                            INNER JOIN agenda ON usuario.idusuario = agenda.idusuario
-                                            WHERE usuario.estado = 2
-                                            ORDER BY usuario.nombreusuario ASC;
-                                        "
+                    usuario.idusuario, 
+                    usuario.nombreusuario, 
+                    usuario.estado 
+                FROM usuario 
+                INNER JOIN agenda ON usuario.idusuario = agenda.idusuario
+                WHERE usuario.estado = 2
+                ORDER BY usuario.nombreusuario ASC;
+            "
         );
         return ($stament->execute()) ? $stament->fetchAll(PDO::FETCH_OBJ) : false;
     }

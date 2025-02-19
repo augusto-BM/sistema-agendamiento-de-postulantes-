@@ -84,6 +84,24 @@ class usuariosModel
 
     public function insertarUsuarios($nombreusuario, $tipodocumento, $dni, $correo, $pass, $celular, $sede, $idempresa, $turno, $estado, $idrol, $fechaingreso)
     {
+        //Verificar si el DNI o el celular ya existen en la BBDD
+        $queryValidar = $this->PDO->prepare("SELECT dni, celular FROM usuario WHERE dni = :dni OR celular = :celular");
+        $queryValidar->bindParam(':dni', $dni);
+        $queryValidar->bindParam(':celular', $celular);
+        $queryValidar->execute();
+        $usuarioExiste = $queryValidar->fetch(PDO::FETCH_ASSOC);
+
+        if ($usuarioExiste) {
+            $errors = [];
+            if ($usuarioExiste['dni'] == $dni) {
+                $errors[] = "El DNI ya está registrado.";
+            }
+            if ($usuarioExiste['celular'] == $celular) {
+                $errors[] = "El celular ya está registrado.";
+            }
+            return ["success" => false, "message" => $errors];
+        }
+
         // Preparamos la consulta SQL para insertar los datos en la tabla
         $stament = $this->PDO->prepare(
             "INSERT INTO usuario 
@@ -106,8 +124,12 @@ class usuariosModel
         $stament->bindParam(':idrol', $idrol);
         $stament->bindParam(':fechaingreso', $fechaingreso);
 
-        // Ejecutar la consulta y retornar el último ID insertado si tiene éxito, o false si falla
-        return ($stament->execute()) ? $this->PDO->lastInsertId() : false;
+        // Ejecutar la consulta y retornar el mensaje de éxito o error
+        if ($stament->execute()) {
+            return ["success" => true, "message" => "Usuario registrado correctamente"];
+        } else {
+            return ["success" => false, "message" => "Hubo un error al registrar el usuario"];
+        }
     }
 
     public function verUsuario($idusuario)
@@ -147,6 +169,25 @@ class usuariosModel
 
     public function editarUsuario($idusuario, $nombreusuario, $tipodocumento, $dni, $correo, $pass, $celular, $idempresa, $turno, $idrol, $fechaingreso)
     {
+        //Verificar si el DNI o el celular ya existen en la BBDD
+        $queryValidar = $this->PDO->prepare("SELECT dni, celular FROM usuario WHERE (dni = :dni OR celular = :celular) AND idusuario != :idusuario");
+        $queryValidar->bindParam(':dni', $dni);
+        $queryValidar->bindParam(':celular', $celular);
+        $queryValidar->bindParam(':idusuario', $idusuario); // Excluir al usuario que está editando
+        $queryValidar->execute();
+        $usuarioExiste = $queryValidar->fetch(PDO::FETCH_ASSOC);
+
+        if ($usuarioExiste) {
+            $errors = [];
+            if ($usuarioExiste['dni'] == $dni) {
+                $errors[] = "El DNI ya está registrado.";
+            }
+            if ($usuarioExiste['celular'] == $celular) {
+                $errors[] = "El celular ya está registrado.";
+            }
+            return ["success" => false, "message" => $errors];
+        }
+
         $sql = "UPDATE 
                     usuario 
                 SET 
@@ -177,7 +218,12 @@ class usuariosModel
         $stament->bindParam(':fechaingreso', $fechaingreso);
         $stament->bindParam(':idusuario', $idusuario);
 
-        return ($stament->execute()) ? $idusuario : false;
+        // Ejecutar la consulta y retornar el mensaje de éxito o error
+        if ($stament->execute()) {
+            return ["success" => true, "message" => "Usuario actualizado correctamente"];
+        } else {
+            return ["success" => false, "message" => "Hubo un error al actualizar el usuario"];
+        }
     }
 
     public function usuariosInactivos($idempresa = null, $page = 1, $limit = 50, $query = "")
@@ -243,6 +289,9 @@ class usuariosModel
 
         return false;
     }
+
+
+
     /* public function delete($id){
         $stament = $this->PDO->prepare("DELETE FROM username WHERE id = :id");
         $stament->bindParam(':id', $id);
