@@ -95,9 +95,28 @@
             }
         }
 
+        public function guardarAgendas($postulante, $tipodocumento, $numerodocumento, $edad, $celular, $celular2, $distrito, $fuente, $contacto, $observaciones, $agenda, $asistencia, $fecharegistro, $horaregistro, $fechaagenda, $turno, $sede, $sedeprincipal, $idusuario)
+    {
+        // Llamar al método insertarUsuarios y verificar si ya existe el usuario
+        $response = $this->model->insertarAgendas($postulante, $tipodocumento, $numerodocumento, $edad, $celular, $celular2, $distrito, $fuente, $contacto, $observaciones, $agenda, $asistencia, $fecharegistro, $horaregistro, $fechaagenda, $turno, $sede, $sedeprincipal, $idusuario);
+
+        // Enviar la respuesta en formato JSON
+        echo json_encode($response);
+        exit();
+    }
+
         public function mostrarAgenda($idagenda)
         {
             return ($this->model->verAgenda($idagenda)) ? $this->model->verAgenda($idagenda) : header("Location:agendas.php");
+        }
+
+        public function actualizarAgenda($idagenda, $postulante, $tipodocumento, $numerodocumento, $edad, $celular,  $distrito, $fuente, $contacto, $observaciones, $agenda, $estado, $fechaagenda, $fecha_agenda_original, $fechaagendamodificacion, $turno, $sede, $sedeprincipal, $idusuario)
+        {
+            $response = $this->model->editarAgenda($idagenda, $postulante, $tipodocumento, $numerodocumento, $edad, $celular,  $distrito, $fuente, $contacto, $observaciones, $agenda, $estado, $fechaagenda, $fecha_agenda_original, $fechaagendamodificacion, $turno, $sede, $sedeprincipal, $idusuario);
+    
+            // Enviar la respuesta en formato JSON
+            echo json_encode($response);
+            exit();
         }
 
         public function listarReclutadoress()

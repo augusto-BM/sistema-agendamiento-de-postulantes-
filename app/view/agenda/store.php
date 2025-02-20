@@ -1,5 +1,6 @@
 <?php
 session_start();
+date_default_timezone_set('America/Lima');
 require_once '../../controller/agenda/agendaController.php';
 
 if (isset($_POST['idusuario']) && isset($_POST['celular']) && isset($_POST['contacto']) && isset($_POST['postulante']) && isset($_POST['tipo_documento']) && isset($_POST['numero_documento']) && isset($_POST['cboedad']) && isset($_POST['cbodistrito']) && isset($_POST['cbofuente']) && isset($_POST['fecha_agenda']) && isset($_POST['turno']) && isset($_POST['nombre_sede']) && isset($_POST['observaciones'])) {
@@ -32,8 +33,8 @@ if (isset($_POST['idusuario']) && isset($_POST['celular']) && isset($_POST['cont
 
 
     // Crear una instancia del controlador y llamar a guardarUsuarios
-    $obj = new usuariosController();
-    $obj->guardarUsuarios($postulante, $tipodocumento, $numerodocumento, $edad, $celular, $celular2, $distrito, $fuente, $contacto, $observaciones, $agenda, $asistencia, $fecharegistro, $horaregistro, $fechaagenda, $turno, $sede, $sedeprincipal, $idusuario);
+    $obj = new agendaController();
+    $obj->guardarAgendas($postulante, $tipodocumento, $numerodocumento, $edad, $celular, $celular2, $distrito, $fuente, $contacto, $observaciones, $agenda, $asistencia, $fecharegistro, $horaregistro, $fechaagenda, $turno, $sede, $sedeprincipal, $idusuario);
 } else {
     //echo "Faltan datos necesarios para el registro.";
     $_SESSION['error'] = "Faltan datos necesarios para el registro.";

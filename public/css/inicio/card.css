@@ -1,0 +1,40 @@
+.estados_card {
+    text-align: center;
+
+    & .card{
+        padding: 20px 0;
+    }
+
+    & i{
+        font-size: 50px;
+    }
+
+    & .estado_final_card span{
+        color: #99abb4;
+    }
+    & .estado_final_card span b{
+        color: #455a64;
+    }
+}
+.fuente_card{
+    /* margin-top: 40px; */
+    text-align: center;
+
+    & .card{
+        padding: 0 0 20px 0;
+    }
+
+    & i{
+        font-size: 1.1rem;
+        padding: 20px 0;
+        color: white;
+    }
+
+    & span{
+        font-size: 14px;
+    }
+
+    & span b{
+        font-size: 24.5px;
+    }
+}

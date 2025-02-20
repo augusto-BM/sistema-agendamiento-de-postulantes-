@@ -415,7 +415,7 @@ require_once '../../../config/datossesion/datossesion.php'
                 validarCampo("#postulante", /^[a-zA-Z\s]+$/, "El nombre solo puede contener letras y espacios."),
                 validarCampo("#numero_documento", null, "El numero de documento es obligatorio y debe ser numérico."),
                 validarCampo("#celular", /^[0-9]{9}$/, "El celular debe tener 9 dígitos."),
-                validarCampo("#contacto", /^([0-9]{9})?$/, "El contacto debe tener 9 dígitos."), // Tiene que tener 9 dígitos o ninguno
+                /* validarCampo("#contacto", /^([0-9]{9})?$/, "El contacto debe tener 9 dígitos."), // Tiene que tener 9 dígitos o ninguno */
             ];
 
             validaciones.forEach(validation => {
@@ -447,7 +447,7 @@ require_once '../../../config/datossesion/datossesion.php'
                 if (response && response.success) {
                     mostrarAlertaAgendar("success", "¡Éxito!", response.message);
                 } else {
-                    // Aquí se maneja el error de duplicado
+                    // Aquí se maneja el error de duplicado de datos en la bbdd de dni y celular
                     if (response.message) {
                         response.message.forEach((msg) => {
                             if (msg.includes("DNI")) {

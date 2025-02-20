@@ -14,32 +14,45 @@ class usuariosModel
     {
         $offset = ($page - 1) * $limit;  // Calcular el offset
 
-        // Consulta de usuarios
-        $sqlQuery = "SELECT idusuario, nombreusuario, dni, correo, celular, sede, fechaingreso, estado
-                 FROM usuario WHERE estado = 2";
+        // Consulta de usuarios con INNER JOIN con la tabla 'empresa' y 'sede'
+        $sqlQuery = "SELECT 
+                    u.idusuario AS idusuario, 
+                    u.nombreusuario AS nombreusuario, 
+                    u.dni AS dni, 
+                    u.correo AS correo, 
+                    u.celular AS celular, 
+                    u.fechaingreso AS fechaingreso, 
+                    u.estado AS estado, 
+                    s.nombresede AS sede
+                 FROM usuario u
+                 INNER JOIN empresa e ON u.idempresa = e.idempresa
+                 INNER JOIN sede s ON e.idsede = s.idsede
+                 WHERE u.estado = 2";
 
         // Si idempresa es proporcionado, se filtra en la consulta
         if ($idempresa !== null) {
-            $sqlQuery .= " AND idempresa = :idempresa";
+            $sqlQuery .= " AND u.idempresa = :idempresa";
         }
 
         // Si hay query de búsqueda, agregar el filtro
         if (!empty($query)) {
-            // Agregar los comodines "%" para hacer una búsqueda parcial
             $query = "%" . $query . "%";  // Esto se asegura que la búsqueda sea parcial
-            $sqlQuery .= " AND (nombreusuario LIKE :query OR dni LIKE :query)";
+            $sqlQuery .= " AND (u.nombreusuario LIKE :query OR u.dni LIKE :query)";
         }
 
-        // Consulta de COUNT para obtener el total de registros
-        $countQuery = "SELECT COUNT(*) as total FROM usuario WHERE estado = 2";
+        // Consulta de COUNT con INNER JOIN
+        $countQuery = "SELECT COUNT(*) as total
+                   FROM usuario u
+                   INNER JOIN empresa e ON u.idempresa = e.idempresa
+                   INNER JOIN sede s ON e.idsede = s.idsede
+                   WHERE u.estado = 2";
 
         if ($idempresa !== null) {
-            $countQuery .= " AND idempresa = :idempresa";
+            $countQuery .= " AND u.idempresa = :idempresa";
         }
 
-        // Si hay query de búsqueda, agregar el filtro
         if (!empty($query)) {
-            $countQuery .= " AND (nombreusuario LIKE :query OR dni LIKE :query)";
+            $countQuery .= " AND (u.nombreusuario LIKE :query OR u.dni LIKE :query)";
         }
 
         // Ejecutamos la consulta para contar el total de registros
@@ -54,7 +67,7 @@ class usuariosModel
         $totalRecords = $stmtCount->fetch(PDO::FETCH_OBJ)->total;
 
         // Consulta para obtener los usuarios con LIMIT y OFFSET
-        $sqlQuery .= " ORDER BY nombreusuario ASC LIMIT :limit OFFSET :offset";
+        $sqlQuery .= " ORDER BY u.nombreusuario ASC LIMIT :limit OFFSET :offset";
         $stmt = $this->PDO->prepare($sqlQuery);
 
         if ($idempresa !== null) {
@@ -230,35 +243,48 @@ class usuariosModel
     {
         $offset = ($page - 1) * $limit;  // Calcular el offset
 
-        // Consulta de usuarios
-        $sqlQuery = "SELECT idusuario, nombreusuario, dni, correo, celular, sede, fechaingreso, estado
-                 FROM usuario WHERE estado = 3";
+        // Consulta de usuarios inactivos con INNER JOIN con la tabla 'empresa' y 'sede'
+        $sqlQuery = "SELECT 
+                    u.idusuario AS idusuario, 
+                    u.nombreusuario AS nombreusuario, 
+                    u.dni AS dni, 
+                    u.correo AS correo, 
+                    u.celular AS celular, 
+                    u.fechaingreso AS fechaingreso, 
+                    u.estado AS estado, 
+                    s.nombresede AS sede
+                 FROM usuario u
+                 INNER JOIN empresa e ON u.idempresa = e.idempresa
+                 INNER JOIN sede s ON e.idsede = s.idsede
+                 WHERE u.estado = 3"; // Estado 3 para usuarios inactivos
 
         // Si idempresa es proporcionado, se filtra en la consulta
         if ($idempresa !== null) {
-            $sqlQuery .= " AND idempresa = :idempresa";
+            $sqlQuery .= " AND u.idempresa = :idempresa";
         }
 
         // Si hay query de búsqueda, agregar el filtro
         if (!empty($query)) {
-            // Agregar los comodines "%" para hacer una búsqueda parcial
             $query = "%" . $query . "%";  // Esto se asegura que la búsqueda sea parcial
-            $sqlQuery .= " AND (nombreusuario LIKE :query OR dni LIKE :query)";
+            $sqlQuery .= " AND (u.nombreusuario LIKE :query OR u.dni LIKE :query)";
         }
 
-        // Consulta de COUNT para obtener el total de registros
-        $countQuery = "SELECT COUNT(*) as total FROM usuario WHERE estado = 3";
+        // Consulta de COUNT con INNER JOIN para contar los registros inactivos
+        $countQuery = "SELECT COUNT(*) as total
+                   FROM usuario u
+                   INNER JOIN empresa e ON u.idempresa = e.idempresa
+                   INNER JOIN sede s ON e.idsede = s.idsede
+                   WHERE u.estado = 3"; // Estado 3 para usuarios inactivos
 
         if ($idempresa !== null) {
-            $countQuery .= " AND idempresa = :idempresa";
+            $countQuery .= " AND u.idempresa = :idempresa";
         }
 
-        // Si hay query de búsqueda, agregar el filtro
         if (!empty($query)) {
-            $countQuery .= " AND (nombreusuario LIKE :query OR dni LIKE :query)";
+            $countQuery .= " AND (u.nombreusuario LIKE :query OR u.dni LIKE :query)";
         }
 
-        // Ejecutamos la consulta para contar el total de registros
+        // Ejecutamos la consulta para contar el total de registros inactivos
         $stmtCount = $this->PDO->prepare($countQuery);
         if ($idempresa !== null) {
             $stmtCount->bindParam(':idempresa', $idempresa, PDO::PARAM_INT);
@@ -269,8 +295,8 @@ class usuariosModel
         $stmtCount->execute();
         $totalRecords = $stmtCount->fetch(PDO::FETCH_OBJ)->total;
 
-        // Consulta para obtener los usuarios con LIMIT y OFFSET
-        $sqlQuery .= " ORDER BY nombreusuario ASC LIMIT :limit OFFSET :offset";
+        // Consulta para obtener los usuarios inactivos con LIMIT y OFFSET
+        $sqlQuery .= " ORDER BY u.nombreusuario ASC LIMIT :limit OFFSET :offset";
         $stmt = $this->PDO->prepare($sqlQuery);
 
         if ($idempresa !== null) {
@@ -289,6 +315,9 @@ class usuariosModel
 
         return false;
     }
+
+
+
 
 
 

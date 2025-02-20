@@ -57,7 +57,7 @@ function autenticarUsuario($conn, $email, $password) {
         if ($password === $stored_password) {
 
             // Regenerar el ID de sesión para prevenir fijación de sesión
-            session_regenerate_id(true);  // Regenera el ID de sesión
+            /* session_regenerate_id(true); */  // Regenera el ID de sesión
             
             $rol = htmlspecialchars($row['nombrerol'], ENT_QUOTES, 'UTF-8'); 
     

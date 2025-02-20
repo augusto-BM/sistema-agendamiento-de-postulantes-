@@ -17,17 +17,17 @@ class usuariosModel
         $queryValidar->bindParam(':numerodocumento', $numerodocumento);
         $queryValidar->bindParam(':celular', $celular);
         $queryValidar->execute();
-        $usuarioExiste = $queryValidar->fetch(PDO::FETCH_ASSOC);
+        $agendaExiste = $queryValidar->fetch(PDO::FETCH_ASSOC);
 
-        if ($usuarioExiste) {
+        if ($agendaExiste) {
             $errors = [];
-            if ($usuarioExiste['numerodocumento'] == $numerodocumento) {
+            if ($agendaExiste['numerodocumento'] == $numerodocumento) {
                 $errors[] = "El DNI ya está registrado.";
             }
-            if ($usuarioExiste['celular'] == $celular) {
+            if ($agendaExiste['celular'] == $celular) {
                 $errors[] = "El celular ya está registrado.";
             }
-            return ["success" => false, "message" => $errors];
+            return ["success" => false, "message" => $errors]; // Asegúrate de devolver un mensaje con errores
         }
 
         // Preparamos la consulta SQL para insertar los datos en la tabla
@@ -67,6 +67,87 @@ class usuariosModel
             return ["success" => false, "message" => "Hubo un error al registrar el usuario"];
         }
     }
+
+    public function editarAgenda($idagenda, $postulante, $tipodocumento, $numerodocumento, $edad, $celular,  $distrito, $fuente, $contacto, $observaciones, $agenda, $estado, $fechaagenda, $fecha_agenda_original, $fechaagendamodificacion, $turno, $sede, $sedeprincipal, $idusuario)
+    {
+        // Verificar si el DNI o el celular ya existen en la BBDD
+        $queryValidar = $this->PDO->prepare("SELECT numerodocumento, celular FROM agenda WHERE (numerodocumento = :numerodocumento OR celular = :celular) AND idagenda != :idagenda");
+        $queryValidar->bindParam(':numerodocumento', $numerodocumento);
+        $queryValidar->bindParam(':celular', $celular);
+        $queryValidar->bindParam(':idagenda', $idagenda);
+        $queryValidar->execute();
+        $agendaExiste = $queryValidar->fetch(PDO::FETCH_ASSOC);
+
+        if ($agendaExiste) {
+            $errors = [];
+            if ($agendaExiste['numerodocumento'] == $numerodocumento) {
+                $errors[] = "El DNI ya está registrado.";
+            }
+            if ($agendaExiste['celular'] == $celular) {
+                $errors[] = "El celular ya está registrado.";
+            }
+            return ["success" => false, "message" => $errors];
+        }
+
+        // Verificar si las fechas son diferentes
+        if ($fechaagenda != $fecha_agenda_original) {
+            // Si las fechas son distintas, incrementar fechaagendamodificacion
+            $fechaagendamodificacion++;
+        }
+
+        // Consulta SQL para actualizar la agenda
+        $sql = "UPDATE agenda 
+                SET 
+                    postulante = :postulante,
+                    tipodocumento = :tipodocumento,
+                    numerodocumento = :numerodocumento,
+                    edad = :edad,
+                    celular = :celular,
+                    distrito = :distrito,
+                    fuente = :fuente,
+                    contacto = :contacto,
+                    observaciones = :observaciones,
+                    agenda = :agenda,
+                    estado = :estado,
+                    fechaagenda = :fechaagenda,
+                    fechaagendamodificacion = :fechaagendamodificacion,  -- Aquí actualizamos el campo
+                    turno = :turno,
+                    sede = :sede,
+                    sedeprincipal = :sedeprincipal,
+                    idusuario = :idusuario
+                WHERE 
+                    idagenda = :idagenda";
+
+        $stament = $this->PDO->prepare($sql);
+
+        // Vincular los parámetros
+        $stament->bindParam(':postulante', $postulante);
+        $stament->bindParam(':tipodocumento', $tipodocumento);
+        $stament->bindParam(':numerodocumento', $numerodocumento);
+        $stament->bindParam(':edad', $edad);
+        $stament->bindParam(':celular', $celular);
+        $stament->bindParam(':distrito', $distrito);
+        $stament->bindParam(':fuente', $fuente);
+        $stament->bindParam(':contacto', $contacto);
+        $stament->bindParam(':observaciones', $observaciones);
+        $stament->bindParam(':agenda', $agenda);
+        $stament->bindParam(':estado', $estado);
+        $stament->bindParam(':fechaagenda', $fechaagenda);
+        $stament->bindParam(':fechaagendamodificacion', $fechaagendamodificacion);  // Aquí también lo vinculamos
+        $stament->bindParam(':turno', $turno);
+        $stament->bindParam(':sede', $sede);
+        $stament->bindParam(':sedeprincipal', $sedeprincipal);
+        $stament->bindParam(':idusuario', $idusuario);
+        $stament->bindParam(':idagenda', $idagenda);
+
+        // Ejecutar la consulta y retornar el mensaje de éxito o error
+        if ($stament->execute()) {
+            return ["success" => true, "message" => "Agenda actualizada correctamente"];
+        } else {
+            return ["success" => false, "message" => "Hubo un error al actualizar la agenda"];
+        }
+    }
+
 
     public function agendas($idrol, $nombreSede = null, $estado = null, $nombreReclutador = null, $query = null, $nombreUsuario = null, $fechaInicio = null, $fechaFin = null, $page = 1, $limit = 50)
     {
@@ -324,7 +405,7 @@ class usuariosModel
                                                 a.agenda as agenda, a.estado as estado, a.estadofinal as estadofinal, a.asistencia as asistencia,
                                                 a.fecharegistro as fecharegistro, a.horaregistro as horaregistro, a.fechaagenda as fechaagenda,
                                                 a.fechareprogramacion as fechareprogramacion, a.turno as turno, a.sede as sede, a.sedeprincipal as sedeprincipal,
-                                                a.idusuario as idusuario, u.nombreusuario as nombreusuario
+                                                a.idusuario as idusuario, a.fechaagendamodificacion, u.nombreusuario as nombreusuario
                                             FROM agenda a 
                                             INNER JOIN usuario u ON a.idusuario = u.idusuario
                                             WHERE a.idagenda = :idagenda limit 1

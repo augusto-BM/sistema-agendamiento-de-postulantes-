@@ -151,6 +151,7 @@ if (isset($_SESSION['activo'])) {
                 </section>
             </main>
         </div>
+        <!-- FINALIZA CONTENEDOR --> 
         <?php require_once '../components/alertaSesion.php' ?>
 
         <!-- RUTAS DE LOS SCRIPTS NECESARIOS -->

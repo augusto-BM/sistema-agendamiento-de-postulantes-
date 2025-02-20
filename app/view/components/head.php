@@ -1,6 +1,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>Agendamiento - <?php echo TITULO; ?></title>
+    <title><?php echo TITULO; ?> - Recursos Humanos</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="../../../public/img/logo/favicon.ico"/>

@@ -15,6 +15,8 @@ $date = $obj->mostrarAgenda($identificador);
 <div class="container contenedor_registrarArticulo modal-page-registrarArticulo page-1">
     <form class="formulario_verAgenda">
         <div class="card mb-4">
+            <h6 class="mt-3 fw-bold titulo-principal text-start ml-4" style="color: #566a7f; margin-left: 17px;">Ver
+                Postulante </h6>
             <div class="card-body">
                 <div class="row mb-2">
                     <input type="hidden" id="idagenda" value="<?= $identificador ?>">
