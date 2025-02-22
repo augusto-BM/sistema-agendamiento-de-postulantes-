@@ -10,7 +10,7 @@ define('SECCION', 'inicio');
 define('ARCHIVOS_CSS', ['card']);
 
 //Nombre de los archivos JS a importar 
-define('ARCHIVOS_JS', [/* 'principal' */]);
+define('ARCHIVOS_JS', ['ajaxListarTop', 'ajaxEstadosCard']);
 
 //Incluir las rutas dinamicos
 require_once '../../../config/rutas/rutas.php';
@@ -18,6 +18,8 @@ require_once '../../../config/rutas/rutas.php';
 session_start();
 
 header("Content-Type: text/html;charset=utf-8");
+date_default_timezone_set('America/Lima');
+
 /* echo "El ID de sesión es: " . session_id();  */ // Muestra el ID aleadtorio de la sesión actual
 /* echo '<pre>'; print_r($_SESSION); echo '</pre>'; */
 /* session_destroy(); */
@@ -55,15 +57,22 @@ if (isset($_SESSION['activo'])) {
                                 require_once '../../controller/sedes/sedesController.php';
                                 $obj = new SedesController();
                                 $sedes = $obj->listarSedes($idusuario, $idrol, $idempresa);
+
+                                $soloRolPermitido = in_array($idrol, [1, 4]); //AUXILIAR y ADMIN 
+                                $displayCompleto = $soloRolPermitido ? '' : 'display: none;';
                                 ?>
                                 <div class="row mt-2 filtradoFecha">
                                     <!-- SELECT PARA FILTRAR LAS SEDES -->
-                                    <div class="col-md-3">
+                                    <div class="col-md-3" style="<?= $displayCompleto; ?>">
                                         <label class="form-label" for="filtroSedes">Sede</label>
+                                        <input type="hidden" id="fecha-hoy" value="<?= date("Y-m-d");  ?>">
+                                        <input type="hidden" id="idRolSesion" value="<?= $idrol; ?>">
+                                        <input type="hidden" id="idUsuarioSesion" value="<?= $idusuario; ?>">
+
                                         <select class="form-control" id="filtroSedes">
                                             <?php if ($sedes): ?>
                                                 <?php foreach ($sedes as $sede): ?>
-                                                    <option value="<?= $sede->idsede; ?>"><?= $sede->nombresede; ?></option>
+                                                    <option value="<?= $sede->nombresede; ?>"><?= $sede->nombresede; ?></option>
                                                 <?php endforeach; ?>
                                             <?php else: ?>
                                                 <option value="" disabled>No hay sedes disponibles</option>
@@ -72,10 +81,9 @@ if (isset($_SESSION['activo'])) {
                                     </div>
                                 </div>
                             </div>
-                            <br>
 
-                            <div class="row">
-                                <div class="col-6">
+                            <div class="row" style="<?= $displayCompleto; ?>">
+                                <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 mt-3">
                                     <div class="card">
                                         <div class="row">
                                             <div class="col-md-12">
@@ -93,7 +101,7 @@ if (isset($_SESSION['activo'])) {
                                                         <th>AGENDADOS</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody class="table-border-bottom-0" id="data-body">
+                                                <tbody class="table-border-bottom-0" id="data-bodyAgendados">
                                                     <!-- Aquí van los datos de la tabla -->
                                                     <!-- Los datos serán llenados por AJAX -->
                                                 </tbody>
@@ -102,7 +110,7 @@ if (isset($_SESSION['activo'])) {
                                         <div class="pagination m-2 d-flex justify-content-center" id="pagination"></div>
                                     </div>
                                 </div>
-                                <div class="col-6">
+                                <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 mt-3">
                                     <div class="card">
                                         <div class="row">
                                             <div class="col-md-12">
@@ -111,7 +119,7 @@ if (isset($_SESSION['activo'])) {
                                         </div>
                                         <div class="table-responsive col-sm-12 col-md-12 col-lg-12 col-xl-12">
                                             <table class="table table-borderless table-hover w-100 tabla-general"
-                                                id="myTablaUsuarios">
+                                                id="myTablaColaboradoresAsistencias">
                                                 <thead class="table-light">
                                                     <tr>
                                                         <th style="display: none;">id</th>
@@ -120,7 +128,7 @@ if (isset($_SESSION['activo'])) {
                                                         <th>ASISTIERON</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody class="table-border-bottom-0" id="data-body">
+                                                <tbody class="table-border-bottom-0" id="data-bodyAsistencia">
                                                     <!-- Aquí van los datos de la tabla -->
                                                     <!-- Los datos serán llenados por AJAX -->
                                                 </tbody>
@@ -142,169 +150,158 @@ if (isset($_SESSION['activo'])) {
                                 </div>
 
                                 <div class="estados_card">
-                                    <div class="row mt-3 mb-5">
-                                        <div class="col-12 col-sm-6 col-md-3">
-                                            <div class="card" style="background-color: #ACCCF2; color: #515151;">
-                                                <i class="fa-solid fa-people-group"></i>
+                                    <!-- CARD DE OBJETIVOS -->
+                                    <div class="row mt-3 mb-4">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3" style="<?= ($idrol != 3 ? 'display: none;' : '') ?>" >
+                                            <div class="card mt-2 mb-2" style="background-color: #ACCCF2; color: #515151;">
+                                                <i class="fa-solid fa-person"></i>
                                                 <span><b>2</b></span>
                                                 <span>VOY</span>
                                             </div>
                                         </div>
-                                        <div class="col-12 col-sm-6 col-md-3">
-                                            <div class="card" style="background-color: #ACCCF2; color: #515151;">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3" style="<?= ($idrol != 3 ? 'display: none;' : '') ?>">
+                                            <div class="card mt-2 mb-2" style="background-color: #ACCCF2; color: #515151;">
                                                 <i class="fa-solid fa-bullseye"></i>
                                                 <span><b>15</b></span>
                                                 <span>OBJETIVO</span>
                                             </div>
                                         </div>
-                                        <div class="col-12 col-sm-6 col-md-3">
-                                            <div class="card" style="background-color: #BCE69F; color: #515151;">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                                            <div class="card mt-2 mb-2" style="background-color: #BCE69F; color: #515151;">
                                                 <i class="fa-solid fa-people-group"></i>
                                                 <span><b>33</b></span>
                                                 <span>VAMOS</span>
                                             </div>
                                         </div>
-                                        <div class="col-12 col-sm-6 col-md-3">
-                                            <div class="card" style="background-color: #BCE69F; color: #515151;">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                                            <div class="card mt-2 mb-2" style="background-color: #BCE69F; color: #515151;">
                                                 <i class="fa-solid fa-bullseye"></i>
                                                 <span><b>100</b></span>
-                                                <span >OBJETIVO</span>
+                                                <span>OBJETIVO</span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row estado_final_card mt-4">
-                                        <div class="col-12 col-sm-6 col-md-3">
-                                            <div class="card">
+
+                                    <!-- CARD DE ESTADOS -->
+                                    <div class="row estado_final_card">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                                            <div class="card mt-2 mb-2">
                                                 <i class="fa fa-user" style="color: #ff9800;"></i>
-                                                <span><b>33</b></span>
+                                                <span><b id="countAgenda"></b></span>
                                                 <span>AGENDA</span>
                                             </div>
                                         </div>
-                                        <div class="col-12 col-sm-6 col-md-3">
-                                            <div class="card">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                                            <div class="card mt-2 mb-2">
                                                 <i class="fa-solid fa-users" style="color: #2196f3;"></i>
-                                                <span><b>33</b></span>
+                                                <span><b id="countEntrevista"></b></span>
                                                 <span>ENTREVISTA</span>
                                             </div>
                                         </div>
-                                        <div class="col-12 col-sm-6 col-md-3">
-                                            <div class="card">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                                            <div class="card mt-2 mb-2">
                                                 <i class="fa-solid fa-circle-check" style="color: #2196f3;"></i>
-                                                <span><b>33</b></span>
+                                                <span><b id="countConfirmados"></b></span>
                                                 <span>CONFIRMADOS</span>
                                             </div>
                                         </div>
-                                        <div class="col-12 col-sm-6 col-md-3">
-                                            <div class="card">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                                            <div class="card mt-2 mb-2">
                                                 <i class="fa-solid fa-calendar-check" style="color: #009688;"></i>
-                                                <span><b>33</b></span>
-                                                <span>CONFIRMADOS</span>
+                                                <span><b id="countAsistieron"></b></span>
+                                                <span>ASISTIERON</span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row estado_final_card mt-3">
-                                        <div class="col-12 col-sm-6 col-md-3">
-                                            <div class="card">
+                                    <div class="row estado_final_card">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                                            <div class="card mt-2 mb-2">
                                                 <i class="fa-solid fa-phone-slash" style="color: #e91e63;"></i>
-                                                <span><b>33</b></span>
+                                                <span><b id="countNoresponde"></b></span>
                                                 <span>NO RESPONDE</span>
                                             </div>
                                         </div>
-                                        <div class="col-12 col-sm-6 col-md-3">
-                                            <div class="card">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                                            <div class="card mt-2 mb-2">
                                                 <i class="fa-solid fa-comment-slash" style="color: #e91e63;"></i>
-                                                <span><b>33</b></span>
+                                                <span><b id="countNointeresado"></b></span>
                                                 <span>NO INTERESADO</span>
                                             </div>
                                         </div>
-                                        <div class="col-12 col-sm-6 col-md-3">
-                                            <div class="card">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                                            <div class="card mt-2 mb-2">
                                                 <i class="fa-solid fa-ban" style="color: #1f1f1f;"></i>
-                                                <span><b>33</b></span>
+                                                <span><b id="countListanegra"></b></span>
                                                 <span>LISTA NEGRA</span>
                                             </div>
                                         </div>
-                                        <div class="col-12 col-sm-6 col-md-3">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="fuente_card mt-5">
+                                <!-- CARD DE REDES SOCIALES -->
+                                <div class="fuente_card mt-3">
                                     <div class="row mt-3">
-                                        <div class="col-12 col-sm-6 col-md-3">
-                                            <div class="card">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                                            <div class="card mt-2 mb-2">
                                                 <i class="fa-brands fa-facebook" style="background-color: #3b5998;"> FACEBOOK</i>
-                                                <span><b>33</b></span>
+                                                <span><b id="countFacebook"></b></span>
                                                 <span>AGENDADOS</span>
                                             </div>
                                         </div>
-                                        <div class="col-12 col-sm-6 col-md-3">
-                                            <div class="card">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                                            <div class="card mt-2 mb-2">
                                                 <i class="fa fa-briefcase" style="background-color: #0077B5;"> COMPUTRABAJO</i>
-                                                <span><b>33</b></span>
+                                                <span><b id="countComputrabajo"></b></span>
                                                 <span>AGENDADOS</span>
                                             </div>
                                         </div>
-                                        <div class="col-12 col-sm-6 col-md-3">
-                                            <div class="card">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                                            <div class="card mt-2 mb-2">
                                                 <i class="fa-brands fa-instagram" style="background-color: #E1306C;"> INSTAGRAM</i>
-                                                <span><b>33</b></span>
+                                                <span><b id="countInstagram"></b></span>
                                                 <span>AGENDADOS</span>
                                             </div>
                                         </div>
-                                        <div class="col-12 col-sm-6 col-md-3">
-                                            <div class="card">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                                            <div class="card mt-2 mb-2">
                                                 <i class="fa-brands fa-tiktok" style="background-color: #000000;"> TIKTOK</i>
-                                                <span><b>33</b></span>
+                                                <span><b id="countTiktok"></b></span>
                                                 <span>AGENDADOS</span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row mt-3">
-                                        <div class="col-12 col-sm-6 col-md-3">
-                                            <div class="card">
-                                                <i class="fa-solid fa-receipt" style="background-color: rgba(255, 87, 51, 1);"> VOLANTES</i>
-                                                <span><b>33</b></span>
-                                                <span>AGENDADOS</span>
-                                            </div>
-                                        </div>
-                                        <div class="col-12 col-sm-6 col-md-3">
-                                            <div class="card">
+                                    <div class="row">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                                            <div class="card mt-2 mb-2">
                                                 <i class="fa-solid fa-people-arrows" style="background-color: rgba(255, 159, 0, 1);"> REFERIDO</i>
-                                                <span><b>33</b></span>
+                                                <span><b id="countReferido"></b></span>
                                                 <span>AGENDADOS</span>
                                             </div>
                                         </div>
-                                        <div class="col-12 col-sm-6 col-md-3">
-                                            <div class="card">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                                            <div class="card mt-2 mb-2">
                                                 <i class="fa-solid fa-chevron-right" style="background-color: rgba(255, 205, 0, 1);"> BUMERAN</i>
-                                                <span><b>33</b></span>
+                                                <span><b id="countBumeran"></b></span>
                                                 <span>AGENDADOS</span>
                                             </div>
                                         </div>
-                                        <div class="col-12 col-sm-6 col-md-3">
-                                            <div class="card">
-                                                <i class="fa-solid fa-note-sticky" style="background-color: rgba(76, 175, 80, 1);"> VOLANTEO</i>
-                                                <span><b>33</b></span>
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                                            <div class="card mt-2 mb-2">
+                                                <i class="fa-brands fa-facebook" style="background-color: rgba(76, 175, 80, 1);"> OTROS</i>
+                                                <span><b id="countOtros"></b></span>
                                                 <span>AGENDADOS</span>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="row mt-3">
-                                        <div class="col-12 col-sm-6 col-md-3">
-                                            <div class="card">
-                                                <i class="fa-brands fa-facebook" style="background-color: #00A0D7;"> OTROS</i>
-                                                <span><b>33</b></span>
-                                                <span>AGENDADOS</span>
-                                            </div>
-                                        </div>
-                                        <div class="col-12 col-sm-6 col-md-3">
-                                            <div class="card">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                                            <div class="card mt-2 mb-2">
                                                 <i class="fa-solid fa-calendar" style="background-color: #3D61F7;"> RE-AGENDADOS</i>
-                                                <span><b>33</b></span>
+                                                <span><b id="countReagendados"></b></span>
                                                 <span>AGENDADOS</span>
                                             </div>
                                         </div>
+
                                     </div>
                                 </div>
 

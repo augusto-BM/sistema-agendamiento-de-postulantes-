@@ -96,7 +96,7 @@ require_once '../../../config/datossesion/datossesion.php'
                         </select>
                         <div class="invalid-feedback">Este campo es obligatorio.</div>
                     </div>
-                    <input type="text" id="nombre_sede" name="nombre_sede">
+                    <input type="hidden" id="nombre_sede" name="nombre_sede">
 
                     <div class="col-md-4">
                         <label for="turno" class="form-label">TURNO <span class="asterisco"
