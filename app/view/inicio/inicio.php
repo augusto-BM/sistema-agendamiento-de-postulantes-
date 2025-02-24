@@ -10,7 +10,7 @@ define('SECCION', 'inicio');
 define('ARCHIVOS_CSS', ['card']);
 
 //Nombre de los archivos JS a importar 
-define('ARCHIVOS_JS', ['ajaxListarTop', 'ajaxEstadosCard']);
+define('ARCHIVOS_JS', ['ajaxListarTop', 'ajaxObjetivosCard', 'ajaxEstadosCard', 'ajaxDireccionarCardEstados']);
 
 //Incluir las rutas dinamicos
 require_once '../../../config/rutas/rutas.php';
@@ -52,23 +52,24 @@ if (isset($_SESSION['activo'])) {
                         <div class="content-wrapper">
                             <div class="container-xxl flex-grow-1 container-p-y contenedor-secundario">
                                 <h4 class="fw-bold py-3 mb-1"><span class="text-muted fw-light">Inicio /</span>
-                                    Estadisticas</h4>
+                                    Estadistica de hoy</h4>
                                 <?php
                                 require_once '../../controller/sedes/sedesController.php';
                                 $obj = new SedesController();
                                 $sedes = $obj->listarSedes($idusuario, $idrol, $idempresa);
 
-                                $soloRolPermitido = in_array($idrol, [1, 4]); //AUXILIAR y ADMIN 
+                                $soloRolPermitido = in_array($idrol, [1, 2, 4]); //AUXILIAR, MODERADOR y ADMIN 
                                 $displayCompleto = $soloRolPermitido ? '' : 'display: none;';
+                                $displayMargenTurno = $soloRolPermitido ? 'mt-4' : '';
                                 ?>
+                                <input type="hidden" id="fecha-hoy" value="<?= date("Y-m-d");  ?>">
+                                <input type="hidden" id="idRolSesion" value="<?= $idrol; ?>">
+                                <input type="hidden" id="idUsuarioSesion" value="<?= $idusuario; ?>">
+
+                                <!-- SELECT PARA FILTRAR LAS SEDES -->
                                 <div class="row mt-2 filtradoFecha">
-                                    <!-- SELECT PARA FILTRAR LAS SEDES -->
                                     <div class="col-md-3" style="<?= $displayCompleto; ?>">
                                         <label class="form-label" for="filtroSedes">Sede</label>
-                                        <input type="hidden" id="fecha-hoy" value="<?= date("Y-m-d");  ?>">
-                                        <input type="hidden" id="idRolSesion" value="<?= $idrol; ?>">
-                                        <input type="hidden" id="idUsuarioSesion" value="<?= $idusuario; ?>">
-
                                         <select class="form-control" id="filtroSedes">
                                             <?php if ($sedes): ?>
                                                 <?php foreach ($sedes as $sede): ?>
@@ -80,8 +81,11 @@ if (isset($_SESSION['activo'])) {
                                         </select>
                                     </div>
                                 </div>
+                                <!-- FINALIZA SELECT PARA FILTRAR LAS SEDES -->
+
                             </div>
 
+                            <!-- TABLAS TOP 5  -->
                             <div class="row" style="<?= $displayCompleto; ?>">
                                 <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 mt-3">
                                     <div class="card">
@@ -107,7 +111,6 @@ if (isset($_SESSION['activo'])) {
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <div class="pagination m-2 d-flex justify-content-center" id="pagination"></div>
                                     </div>
                                 </div>
                                 <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 mt-3">
@@ -134,13 +137,14 @@ if (isset($_SESSION['activo'])) {
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <div class="pagination m-2 d-flex justify-content-center" id="pagination"></div>
                                     </div>
                                 </div>
                             </div>
+                            <!-- FINALIZA TABLAS TOP 5  -->
 
-                            <div class="row mt-4 filtradoTurno">
-                                <!-- SELECT PARA FILTRAR LAS SEDES -->
+                            <div class="row <?= $displayMargenTurno ?> filtradoTurno">
+
+                                <!-- TABLAS TURNO  -->
                                 <div class="col-md-3">
                                     <label class="form-label" for="turno">Turno</label>
                                     <select type="text" id="turno" name="turno" class="form-control" required>
@@ -148,14 +152,16 @@ if (isset($_SESSION['activo'])) {
                                         <option value="TARDE">TARDE</option>
                                     </select>
                                 </div>
+                                <!-- FINALIZA TABLAS TURNO  -->
 
+                                <!-- CARD DE ESTADOS DE AGENDADOS  -->
                                 <div class="estados_card">
                                     <!-- CARD DE OBJETIVOS -->
                                     <div class="row mt-3 mb-4">
-                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3" style="<?= ($idrol != 3 ? 'display: none;' : '') ?>" >
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3" style="<?= ($idrol != 3 ? 'display: none;' : '') ?>">
                                             <div class="card mt-2 mb-2" style="background-color: #ACCCF2; color: #515151;">
                                                 <i class="fa-solid fa-person"></i>
-                                                <span><b>2</b></span>
+                                                <span><b id="countVoy"></b></span>
                                                 <span>VOY</span>
                                             </div>
                                         </div>
@@ -169,7 +175,7 @@ if (isset($_SESSION['activo'])) {
                                         <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
                                             <div class="card mt-2 mb-2" style="background-color: #BCE69F; color: #515151;">
                                                 <i class="fa-solid fa-people-group"></i>
-                                                <span><b>33</b></span>
+                                                <span><b id="countVamos"></b></span>
                                                 <span>VAMOS</span>
                                             </div>
                                         </div>
@@ -181,64 +187,66 @@ if (isset($_SESSION['activo'])) {
                                             </div>
                                         </div>
                                     </div>
+                                    <!-- FINALIZA CARD DE OBJETIVOS  -->
 
                                     <!-- CARD DE ESTADOS -->
                                     <div class="row estado_final_card">
-                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
-                                            <div class="card mt-2 mb-2">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3" title="Ver agendados">
+                                            <div class="card mt-2 mb-2 cardEstados" id="agendaCard" data-nombrearchivo="agenda">
                                                 <i class="fa fa-user" style="color: #ff9800;"></i>
                                                 <span><b id="countAgenda"></b></span>
                                                 <span>AGENDA</span>
                                             </div>
                                         </div>
-                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
-                                            <div class="card mt-2 mb-2">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3" title="Ver entrevistados">
+                                            <div class="card mt-2 mb-2 cardEstados" id="entrevistaCard" data-nombrearchivo="entrevista">
                                                 <i class="fa-solid fa-users" style="color: #2196f3;"></i>
                                                 <span><b id="countEntrevista"></b></span>
                                                 <span>ENTREVISTA</span>
                                             </div>
                                         </div>
-                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
-                                            <div class="card mt-2 mb-2">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3" title="Ver confirmados">
+                                            <div class="card mt-2 mb-2 cardEstados" id="confirmadosCard" data-nombrearchivo="confirmados">
                                                 <i class="fa-solid fa-circle-check" style="color: #2196f3;"></i>
                                                 <span><b id="countConfirmados"></b></span>
                                                 <span>CONFIRMADOS</span>
                                             </div>
                                         </div>
-                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
-                                            <div class="card mt-2 mb-2">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3" title="Ver asistieron">
+                                            <div class="card mt-2 mb-2 cardEstados" id="asistieronCard" data-nombrearchivo="asistieron">
                                                 <i class="fa-solid fa-calendar-check" style="color: #009688;"></i>
                                                 <span><b id="countAsistieron"></b></span>
                                                 <span>ASISTIERON</span>
                                             </div>
                                         </div>
                                     </div>
+
                                     <div class="row estado_final_card">
-                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
-                                            <div class="card mt-2 mb-2">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3" title="Ver no responden">
+                                            <div class="card mt-2 mb-2 cardEstados" id="norespondeCard" data-nombrearchivo="noResponde">
                                                 <i class="fa-solid fa-phone-slash" style="color: #e91e63;"></i>
                                                 <span><b id="countNoresponde"></b></span>
                                                 <span>NO RESPONDE</span>
                                             </div>
                                         </div>
-                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
-                                            <div class="card mt-2 mb-2">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3" title="Ver no interesados">
+                                            <div class="card mt-2 mb-2 cardEstados" id="nointeresadoCard" data-nombrearchivo="noInteresados">
                                                 <i class="fa-solid fa-comment-slash" style="color: #e91e63;"></i>
                                                 <span><b id="countNointeresado"></b></span>
                                                 <span>NO INTERESADO</span>
                                             </div>
                                         </div>
-                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
-                                            <div class="card mt-2 mb-2">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3" title="Ver lista negra">
+                                            <div class="card mt-2 mb-2 cardEstados" id="listanegraCard" data-nombrearchivo="listaNegra">
                                                 <i class="fa-solid fa-ban" style="color: #1f1f1f;"></i>
                                                 <span><b id="countListanegra"></b></span>
                                                 <span>LISTA NEGRA</span>
                                             </div>
                                         </div>
-                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
-                                        </div>
                                     </div>
+                                    <!-- FINALIZA CARD DE ESTADOS -->
                                 </div>
+                                <!-- FINALIZA CARD DE ESTADOS DE AGENDADOS  -->
 
                                 <!-- CARD DE REDES SOCIALES -->
                                 <div class="fuente_card mt-3">
@@ -289,7 +297,7 @@ if (isset($_SESSION['activo'])) {
                                         </div>
                                         <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
                                             <div class="card mt-2 mb-2">
-                                                <i class="fa-brands fa-facebook" style="background-color: rgba(76, 175, 80, 1);"> OTROS</i>
+                                                <i class="fa-solid fa-arrows-spin" style="background-color: rgba(76, 175, 80, 1);"> OTROS</i>
                                                 <span><b id="countOtros"></b></span>
                                                 <span>AGENDADOS</span>
                                             </div>
@@ -304,6 +312,7 @@ if (isset($_SESSION['activo'])) {
 
                                     </div>
                                 </div>
+                                <!-- FINALIZA CARD DE REDES SOCIALES -->
 
                             </div>
 

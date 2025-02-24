@@ -13,6 +13,7 @@ if (isset($_POST['idusuario']) && isset($_POST['nombre_colaborador']) && isset($
     $pass = $_POST['pass'];
     $celular = $_POST['celular'];
     $empresa = $_POST['id_empresa'];
+    $sede = $_POST['nombre_sede'];
     $turno = $_POST['turno'];
     $rol = $_POST['id_rol'];
     $fechaingreso = $_POST['fecha_ingreso'];
@@ -20,7 +21,7 @@ if (isset($_POST['idusuario']) && isset($_POST['nombre_colaborador']) && isset($
     try {
         // Crear una instancia del controlador y llamar a guardarUsuarios
         $obj = new usuariosController();
-        $obj->actualizarUsuario($idusuario, $nombreusuario, $tipodocumento, $numerodocumento, $correoelectronico, $pass, $celular, $empresa, $turno, $rol, $fechaingreso);
+        $obj->actualizarUsuario($idusuario, $nombreusuario, $tipodocumento, $numerodocumento, $correoelectronico, $pass, $celular, $empresa, $sede, $turno, $rol, $fechaingreso);
     } catch (Exception $e) {
         // Capturamos cualquier excepción y la lanzamos
         echo 'error: ' . $e->getMessage();

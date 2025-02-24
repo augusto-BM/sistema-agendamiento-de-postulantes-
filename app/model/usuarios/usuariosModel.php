@@ -180,7 +180,7 @@ class usuariosModel
         return ($stament->execute()) ? $stament->fetch(PDO::FETCH_OBJ) : false;
     }
 
-    public function editarUsuario($idusuario, $nombreusuario, $tipodocumento, $dni, $correo, $pass, $celular, $idempresa, $turno, $idrol, $fechaingreso)
+    public function editarUsuario($idusuario, $nombreusuario, $tipodocumento, $dni, $correo, $pass, $celular, $idempresa, $sede, $turno, $idrol, $fechaingreso)
     {
         //Verificar si el DNI o el celular ya existen en la BBDD
         $queryValidar = $this->PDO->prepare("SELECT dni, celular FROM usuario WHERE (dni = :dni OR celular = :celular) AND idusuario != :idusuario");
@@ -210,6 +210,7 @@ class usuariosModel
                     correo = :correo,
                     pass = :pass,
                     celular = :celular,
+                    sede = :sede,
                     idempresa = :idempresa,
                     turno = :turno,
                     idrol = :idrol,
@@ -225,6 +226,7 @@ class usuariosModel
         $stament->bindParam(':correo', $correo);
         $stament->bindParam(':pass', $pass);
         $stament->bindParam(':celular', $celular);
+        $stament->bindParam(':sede', $sede);
         $stament->bindParam(':idempresa', $idempresa);
         $stament->bindParam(':turno', $turno);
         $stament->bindParam(':idrol', $idrol);

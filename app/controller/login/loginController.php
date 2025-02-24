@@ -68,7 +68,7 @@ function autenticarUsuario($conn, $email, $password) {
             if (!empty($rol)) {
                 // Agrupar todos los valores en un array asociativo
                 $_SESSION = array_merge($_SESSION, [
-                    'exitoso' => 'BIENVENIDO, ' . htmlspecialchars($row['nombreusuario'], ENT_QUOTES, 'UTF-8'),
+                    'exitoso' => 'BIENVENIDO(A), ' . htmlspecialchars($row['nombreusuario'], ENT_QUOTES, 'UTF-8'),
 
                     'idusuario' => htmlspecialchars($row['idusuario'], ENT_QUOTES, 'UTF-8'),
                     'nombreusuario' => htmlspecialchars($row['nombreusuario'], ENT_QUOTES, 'UTF-8'),

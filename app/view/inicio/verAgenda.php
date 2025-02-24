@@ -90,7 +90,7 @@ $date = $obj->mostrarAgenda($identificador);
                     </div>
                     <div class="col-md-3">
                         <label for="edad" class="form-label">FECHA DE PROGRAMACION </label>
-                        <input type="text" id="edad" name="edad" class="form-control ver" value="<?= !empty($date->fechareprogramacion) ? date('d-m-Y', strtotime($date->fechareprogramacion)) : ''; ?>" placeholder=" Sin fecha" readonly>
+                        <input type="" id="edad" name="edad" class="form-control ver" value="<?= $date->fechareprogramacion; ?>" placeholder="Sin fecha" readonly>
                     </div>
                 </div>
                 <div class="row mb-2">

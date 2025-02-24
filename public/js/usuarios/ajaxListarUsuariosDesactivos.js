@@ -162,7 +162,7 @@ function generarFilaUsuarioDesactivos(usuario, counterDesactivos) {
         <td style='display: none;'>${usuario.correo}</td>
         <td>${usuario.celular}</td>
         <td>${usuario.sede}</td>
-        <td>${usuario.fechaingreso}</td>
+        <td>${formatearFechaVista(usuario.fechaingreso)}</td>
         <td>
           <button class="btn btn-${estadoClaseDesactivos}" style="width: 110px; opacity: 0.65;" title="Cambiar estado" onclick="handleEstadoChange(${usuario.idusuario}, ${usuario.estado})">
             ${estadoTextoDesactivos}

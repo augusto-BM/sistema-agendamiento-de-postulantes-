@@ -16,6 +16,7 @@ define('ARCHIVOS_JS', ['ajaxListarAgenda']);
 require_once '../../../config/rutas/rutas.php';
 /* ******************************************************************** */
 session_start();
+date_default_timezone_set('America/Lima');
 
 header("Content-Type: text/html;charset=utf-8");
 
@@ -67,7 +68,7 @@ if (isset($_SESSION['activo'])) {
                                 $obj2 = new agendaController();
 
                                 $sedes = $obj->listarSedes($idusuario, $idrol, $idempresa);
-                                $reclutadores = $obj2->listarReclutadoress();
+                                $reclutadores = $obj2->listarReclutadoress($idusuario, $idrol, $idempresa);
 
 
                                 $soloRolPermitido = in_array($idrol, [2, 4]); //MODERADOR y ADMIN 
@@ -76,19 +77,21 @@ if (isset($_SESSION['activo'])) {
 
                                 <input type="hidden" id="idrolSesion" value="<?= $idrol; ?>" name="idrolSesion">
                                 <input type="hidden" id="nombreUsuarioSesion" value="<?= $nombreusuario; ?>" name="nombreUsuarioSesion">
+                                <input type="hidden" id="nombreSedeSesion" value="<?= $nombresede; ?>" name="nombreUsuarioSesion">
 
                                 <div class="row filtradoAdmin">
                                     <div class="col-md-2">
                                         <label class="form-label" for="filtroFecha">Selecciona:</label>
+                                        <input type="hidden" value="<?= date('Y-m-d'); ?>" id="fechaActual">
                                         <select class="form-control" id="filtroFecha">
                                             <option style="display: none;" value="" disabled>Fecha Personalizada</option>
-                                            <option value="hoy">Hoy</option>
-                                            <option value="ayer">Ayer</option>
-                                            <option value="semana">Ultimos 7 dias</option>
-                                            <option value="mes" selected>Ultimo mes</option>
-                                            <option value="tresMeses">Ultimos 3 meses</option>
-                                            <option value="seisMeses">Ultimos 6 meses</option>
-                                            <option value="doceMeses">Ultimos 12 meses</option>
+                                            <option value="<?= date('Y-m-d'); ?>">Hoy</option>
+                                            <option value="<?= date('Y-m-d', strtotime('-1 day')); ?>">Ayer</option>
+                                            <option value="<?= date('Y-m-d', strtotime('-7 days')); ?>">Ultimos 7 dias</option>
+                                            <option value="<?= date('Y-m-d', strtotime('-1 month')); ?>" selected>Ultimo mes</option>
+                                            <option value="<?= date('Y-m-d', strtotime('-3 months')); ?>">Ultimos 3 meses</option>
+                                            <option value="<?= date('Y-m-d', strtotime('-6 months')); ?>">Ultimos 6 meses</option>
+                                            <option value="<?= date('Y-m-d', strtotime('-12 months')); ?>">Ultimos 12 meses</option>
                                         </select>
                                     </div>
                                     <div class="col-md-2">

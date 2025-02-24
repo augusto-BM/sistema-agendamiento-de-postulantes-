@@ -93,6 +93,7 @@ class usuariosModel
         if ($fechaagenda != $fecha_agenda_original) {
             // Si las fechas son distintas, incrementar fechaagendamodificacion
             $fechaagendamodificacion++;
+            $fechareprogramacion = $fechaagenda;
         }
 
         // Consulta SQL para actualizar la agenda
@@ -110,7 +111,8 @@ class usuariosModel
                     agenda = :agenda,
                     estado = :estado,
                     fechaagenda = :fechaagenda,
-                    fechaagendamodificacion = :fechaagendamodificacion,  -- Aquí actualizamos el campo
+                    fechareprogramacion = :fechareprogramacion,
+                    fechaagendamodificacion = :fechaagendamodificacion,
                     turno = :turno,
                     sede = :sede,
                     sedeprincipal = :sedeprincipal,
@@ -133,7 +135,8 @@ class usuariosModel
         $stament->bindParam(':agenda', $agenda);
         $stament->bindParam(':estado', $estado);
         $stament->bindParam(':fechaagenda', $fechaagenda);
-        $stament->bindParam(':fechaagendamodificacion', $fechaagendamodificacion);  // Aquí también lo vinculamos
+        $stament->bindParam(':fechareprogramacion', $fechareprogramacion);
+        $stament->bindParam(':fechaagendamodificacion', $fechaagendamodificacion);
         $stament->bindParam(':turno', $turno);
         $stament->bindParam(':sede', $sede);
         $stament->bindParam(':sedeprincipal', $sedeprincipal);
@@ -414,19 +417,41 @@ class usuariosModel
         return ($stament->execute()) ? $stament->fetch(PDO::FETCH_OBJ) : false;
     }
 
-    public function reclutadoress()
+    public function reclutadoress($idrol, $idempresa)
     {
-        $stament = $this->PDO->prepare(
-            "   SELECT DISTINCT 
-                    usuario.idusuario, 
-                    usuario.nombreusuario, 
-                    usuario.estado 
-                FROM usuario 
-                INNER JOIN agenda ON usuario.idusuario = agenda.idusuario
-                WHERE usuario.estado = 2
-                ORDER BY usuario.nombreusuario ASC;
-            "
-        );
-        return ($stament->execute()) ? $stament->fetchAll(PDO::FETCH_OBJ) : false;
+        // Inicializamos la variable $stament
+        $stament = null;
+
+        $query = "  SELECT DISTINCT 
+                        usuario.idusuario, 
+                        usuario.nombreusuario,
+                        usuario.idempresa, 
+                        usuario.estado 
+                    FROM usuario 
+                    INNER JOIN agenda ON usuario.idusuario = agenda.idusuario
+                    WHERE usuario.estado = 2";
+
+        // Si el rol es MODERADOR o USUARIO, se agrega el filtro por sede
+        if ($idrol == 2 || $idrol == 3) { // MODERADOR Y USUARIO
+            $query .= " AND usuario.idempresa = :idempresa";
+        }
+
+        // Ordenamos por nombre de sede
+        $query .= " ORDER BY usuario.nombreusuario ASC";
+
+        // Preparamos la consulta
+        $stament = $this->PDO->prepare($query);
+
+        // Si el rol es MODERADOR o USUARIO, vinculamos el parámetro
+        if ($idrol == 2 || $idrol == 3) {
+            $stament->bindParam(':idempresa', $idempresa, PDO::PARAM_INT);
+        }
+
+        if ($stament !== null) {
+            $stament->execute();
+            return ($stament->rowCount() > 0) ? $stament->fetchAll(PDO::FETCH_OBJ) : [];
+        } else {
+            return [];
+        }
     }
 }

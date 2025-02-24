@@ -10,3 +10,6 @@
     </div>
   </div>
 </footer>
+
+<?php require_once '../components/alertaSesion.php' ?>
+

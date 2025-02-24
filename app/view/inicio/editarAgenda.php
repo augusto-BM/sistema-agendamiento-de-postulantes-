@@ -16,7 +16,7 @@ $sedes = $obj->listarSedes($idusuario, $idrol, $idempresa);
 
 $obj2 = new agendaController();
 $date = $obj2->mostrarAgenda($identificador);
-$reclutadores = $obj2->listarReclutadoress($idusuario, $idrol, $idempresa);
+$reclutadores = $obj2->listarReclutadoress();
 
 ?>
 <div class="container contenedor_registrarArticulo modal-page-registrarArticulo page-1">
@@ -24,7 +24,7 @@ $reclutadores = $obj2->listarReclutadoress($idusuario, $idrol, $idempresa);
         <div class="card mb-4">
             <h6 class="mt-3 fw-bold titulo-principal text-start ml-4" style="color: #566a7f; margin-left: 17px;">Editar
                 Postulante <span class="campo_obligatorio campo_obligatorio">(*) Campo obligatorio</span>
-                <?php echo ($idrol == 1) ? '<span style="position: absolute; right: 0; margin-right: 30px; margin-top: 5px; font-size: 13px; font-weight: bold; color:rgb(199, 72, 47)">Advertencia: <span style="color: #19727A;">Solo puedes reprogramar al postulante 3 veces.</span></span>' : ''; ?>
+                <?php echo ($idrol == 1) ? '<span style="position: absolute; right: 0; margin-right: 30px; margin-top: 5px; font-size: 13px; font-weight: bold; color:rgb(199, 72, 47)">Advertencia: <span style="color: #19727A;">Solo puedes reprogramar al postulante 3 veces.</span></span>': ''; ?>
 
             </h6>
             <div class="card-body">
@@ -252,11 +252,6 @@ $reclutadores = $obj2->listarReclutadoress($idusuario, $idrol, $idempresa);
             $('#estado_agenda').css('pointer-events', 'none');
         });
     });
-
-    // Si ya está en "REPROGRAMADO", deshabilitar el select completamente.
-    if ($('#estado_agenda').val() === 'REPROGRAMADO') {
-        $('#estado_agenda').css('pointer-events', 'none');
-    }
 </script>
 
 <script>

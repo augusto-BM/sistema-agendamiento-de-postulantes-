@@ -1,20 +1,16 @@
 // VARIABLES GLOBALES
+console.log("Cargado: ajaxListarAgenda.js de incio");
 var page = 1;
 var limit = 50;
 var totalRecords = 0;
 
 var idrolSesion = $("#idrolSesion").val();
-var nombreUsuarioSesion = $("#nombreUsuarioSesion").val();
-var filtroSedes = $("#filtroSedes").val();
-var filtroEstado = $("#filtroEstado").val();
-var filtroRecultador = $("#filtroRecultador").val();
+var idUsuarioSesion = $("#idUsuarioSesion").val();
+var sedeSeleccionadaCard = $("#sedeSeleccionadaCard").val();
+var turnoSeleccionadoCard = $("#turnoSeleccionadoCard").val();
+var fechaAsignadaNextCard = $("#fechaAsignadaNextCard").val();
+
 var filtroInput = $("#buscarSearchData").val();
-
-var nombreSedeSesion = $("#nombreSedeSesion").val();
-
-var fechaActual = $("#fechaActual").val();
-var filtroFecha = $("#filtroFecha").val();
-
 
 
 // Función para actualizar la paginación
@@ -108,7 +104,7 @@ function generarFilaAgenda(agenda, counter) {
   if (!agenda || Object.keys(agenda).length === 0) {
     return `
       <tr>
-        <td colspan="13" class="text-center">Sin resultados</td>
+        <td colspan="7" class="text-center">Sin resultados</td>
       </tr>
     `;
   }
@@ -118,21 +114,20 @@ function generarFilaAgenda(agenda, counter) {
     <tr>
       <td style="display: none;">${agenda.idagenda}</td>
       <td><i class='fab fa-angular fa-lg me-1'></i>${counter}</td>
-      <td>${formatearFechaVista(agenda.fecharegistro)}</td>
+      <td>${agenda.fecharegistro}</td>
       <td>${agenda.postulante}</td>
       <td>${agenda.numerodocumento}</td>
       <td>${agenda.celular}</td>
       <td>${agenda.nombreusuario}</td>
       <td>${agenda.agenda ? agenda.agenda : "NO DEFINIDO"}</td>
       
-      <td>${formatearFechaVista(agenda.fechaagenda)}</td>
       <td>
-        <a href="#" class="btn-ver ms-0 abrirModal" data-id="verAgendas" data-titulo="Ver Agenda" data-prefix="Agenda/" data-identificador="${
+        <a href="#" class="btn-ver ms-0 abrirModal" data-id="verAgenda" data-titulo="Ver Agenda" data-prefix="Agenda/" data-identificador="${
           agenda.idagenda
         }">
           <i class="fa-solid fa-eye fa-lg" title="Ver" style="color: #19727A;"></i>
         </a>
-        <a href="#" class="btn-editar ms-0 abrirModal" data-id="editarAgendas" data-titulo="Editar Agenda" data-prefix="Agenda/" data-identificador="${
+        <a href="#" class="btn-editar ms-0 abrirModal" data-id="editarAgenda" data-titulo="Editar Agenda" data-prefix="Agenda/" data-identificador="${
           agenda.idagenda
         }">
           <i class="fa-solid fa-pen-to-square fa-lg" title="Editar" style="color: #19727A;"></i>
@@ -145,21 +140,16 @@ function generarFilaAgenda(agenda, counter) {
 // Función para cargar agendas
 let ajaxRequest;
 async function cargarAgendas() {
-  // Actualizar los valores de los filtros con los valores actuales del DOM
-  filtroSedes = $("#filtroSedes").val();
-  filtroEstado = $("#filtroEstado").val();
-  filtroRecultador = $("#filtroRecultador").val();
+
   filtroInput = $("#buscarSearchData").val();
 
   const dataToSend = {
     idrolSesion,
-    filtroSedes,
-    filtroEstado,
-    filtroRecultador,
+    sedeSeleccionadaCard,
+    turnoSeleccionadoCard,
+    fechaAsignadaNextCard,
     filtroInput,
-    filtroNombreUsuarioSesion: nombreUsuarioSesion,
-    fechaInicio: $("#fechaInicio").val(),
-    fechaFin: $("#fechaFin").val(),
+    filtroIdUsuarioSesion: idUsuarioSesion,
     page,
     limit,
   };
@@ -173,7 +163,7 @@ async function cargarAgendas() {
 
   try {
     ajaxRequest = $.ajax({
-      url: "../../controller/agenda/agendaController.php?accion=AgendasAjax",
+      url: "../../controller/inicio/inicioController.php?accion=mostrarInicioAgendaAjax",
       method: "GET",
       data: dataToSend,
     });
@@ -181,13 +171,13 @@ async function cargarAgendas() {
     const response = await ajaxRequest;
     //console.log("Respuesta del servidor:", response);
 
-    if (response && response.agendas) {
+    if (response && response.agenda) {
       const tbody = $("#data-body");
       tbody.empty(); // Limpiar datos previos
       let resultadoCount = $("#resultadoCountAgenda");
       let counter = (page - 1) * limit + 1;
 
-      response.agendas.forEach((agenda) => {
+      response.agenda.forEach((agenda) => {
         tbody.append(generarFilaAgenda(agenda, counter));
         counter++;
       });
@@ -209,33 +199,6 @@ async function cargarAgendas() {
 
 $(document).ready(function () {
   let hasTextInputSearchAgenda = false;
-
-  // SI ES MODERADOR APARECE SELECCIONADO EN NOMBRE DE SU SEDE Y NO PUEDE CAMBIARLO
-  if (idrolSesion == 2) {
-    $("#filtroSedes").val(nombreSedeSesion).prop("disabled", true);
-  }
-
-  $("#filtroSedes, #filtroEstado, #filtroRecultador").on("change", function () {
-    if ($("#filtroSedes").prop("disabled") === false) {
-      // Solo resetea la página si el filtro no está deshabilitado
-      page = 1; // Resetea la página a 1
-      cargarAgendas();
-    }
-  });
-
-  // Mostrar u ocultar el botón de búsqueda por fecha
-  $("#fechaInicio, #fechaFin").on("input change", function () {
-    if ($("#fechaInicio").val() && $("#fechaFin").val()) {
-      $("#btn_buscarAgendaFiltros").show();
-    } else {
-      $("#btn_buscarAgendaFiltros").hide();
-    }
-
-    if ($("#fechaInicio").val() && $("#fechaFin").val()) {
-      $('#filtroFecha option[value=""]').show();
-      $("#filtroFecha").val("");
-    }
-  });
 
   // Mostrar u ocultar el botón de búsqueda de colaboradores en función del texto
   $("#buscarSearchData").on("input", function () {
@@ -259,23 +222,6 @@ $(document).ready(function () {
     cargarAgendas();
     $("#btn_buscarAgendaFiltros").hide();
   });
-
-  // Evento para manejar cambios en el filtro de fecha
-  $("#filtroFecha").on("change", function () {
-    var filtro = $(this).val();
-    if (filtro !== "") {
-      $('#filtroFecha option[value=""]').hide();
-    }
-
-    $("#fechaInicio").val(filtro);
-
-    $("#btn_buscarAgendaFiltros").hide();
-    page = 1;
-    cargarAgendas();
-  });
-
-  $("#fechaInicio").val(filtroFecha);
-  $("#fechaFin").val(fechaActual);
 
   cargarAgendas();
 });

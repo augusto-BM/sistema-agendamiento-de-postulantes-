@@ -158,7 +158,7 @@ function generarFilaUsuario(usuario, counter) {
         <td style='display: none;'>${usuario.correo}</td>
         <td>${usuario.celular}</td>
         <td>${usuario.sede}</td>
-        <td>${usuario.fechaingreso}</td>
+        <td>${formatearFechaVista(usuario.fechaingreso)}</td>
         <td>
           <button class="btn btn-${estadoClase}" style="width: 100px; opacity: 0.65;" title="Cambiar estado" onclick="handleEstadoChange(${usuario.idusuario}, ${usuario.estado})">
             ${estadoTexto}

@@ -102,23 +102,26 @@ async function cargarCardAgendadosRedes() {
 // Ejecutar la función al cargar el documento
 $(document).ready(async function () {
   $("#filtroSedes").on("change", function () {
-    if (idRolSesion == 4 || idRolSesion == 1) {
+    if (idRolSesion == 1 | idRolSesion == 2 || idRolSesion == 4) {
       cargarUsuariosTop5Diario();
       cargarUsuariosTop5AsistenciaDiario();
     }
+    cargarCardObjetivosAgendas();
     cargarCardEstadosAgendas();
     cargarCardAgendadosRedes();
   });
 
   $("#turno").on("change", function () {
+    cargarCardObjetivosAgendas();
     cargarCardEstadosAgendas();
     cargarCardAgendadosRedes();
   });
 
-  if (idRolSesion == 4 || idRolSesion == 1) {
+  if (idRolSesion == 1 | idRolSesion == 2 || idRolSesion == 4) {
     cargarUsuariosTop5Diario();
     cargarUsuariosTop5AsistenciaDiario();
   }
+  cargarCardObjetivosAgendas();
   cargarCardEstadosAgendas();
   cargarCardAgendadosRedes();
 });

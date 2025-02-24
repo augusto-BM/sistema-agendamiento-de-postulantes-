@@ -8,8 +8,6 @@
 
         <!-- MODAL DINÁMICO -->
         <?php require_once '../components/modalDinamico.php'; ?>
-        <?php require_once '../components/alertaSesion.php' ?>
-
     </div>
 
     <!-- Espacio vacío en el centro -->

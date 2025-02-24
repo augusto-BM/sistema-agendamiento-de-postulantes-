@@ -87,8 +87,12 @@ require_once '../../../config/datossesion/datossesion.php'
                             <option value="" disabled selected>SELECCIONE</option>
                             <?php if ($sedes): ?>
                                 <?php foreach ($sedes as $sede): ?>
-                                    <option value="<?= $sede->idempresa; ?>" data-nombresede="<?= $sede->nombresede; ?>"
-                                        data-nombreempresa="<?= $sede->nombreempresa; ?>"><?= $sede->nombreempresa; ?></option>
+                                    <option value="<?= $sede->idempresa; ?>" 
+                                        data-nombresede="<?= $sede->nombresede; ?>"
+                                        data-nombreempresa="<?= $sede->nombreempresa; ?>"
+                                        <?= ($sede->idempresa == $idempresa) ? 'selected' : ''; ?>>
+                                        <?= $sede->nombreempresa; ?>
+                                    </option>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <option value="" disabled>No hay empresas activas</option>
@@ -157,19 +161,20 @@ require_once '../../../config/datossesion/datossesion.php'
     </form>
 </div>
 
-<!-- SCRIPT PARA ASIGNARLE AL INPUT EL NOMBRE DE LA SEDE SELECCIONADO -->
 <script>
-    document.getElementById('id_empresa').addEventListener('change', function() {
-        // Obtener la opción seleccionada
-        var selectedOption = this.options[this.selectedIndex];
-
-        // Obtener el nombre de la sede (y opcionalmente el nombre de la empresa)
-        var nombreSede = selectedOption.getAttribute('data-nombresede');
-
-        // Asignar el valor al input invisible
-        document.getElementById('nombre_sede').value = nombreSede;
+    $(document).ready(function() {
+        var selectedOption = $('#id_empresa').find('option:selected');
+        var nombreSede = selectedOption.data('nombresede');
+        $('#nombre_sede').val(nombreSede);
+        
+        $('#id_empresa').change(function() {
+            var selectedOption = $(this).find('option:selected');
+            var nombreSede = selectedOption.data('nombresede');
+            $('#nombre_sede').val(nombreSede);
+        });
     });
 </script>
+
 
 <!-- REGISTAR USUARIO MEDIANTE AJAX -->
 <script>

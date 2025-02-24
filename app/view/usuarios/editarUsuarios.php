@@ -86,6 +86,8 @@ $date = $obj3->mostrarUsuario($identificador);
                             <?php if ($sedes): ?>
                                 <?php foreach ($sedes as $sede): ?>
                                     <option value="<?= $sede->idempresa; ?>"
+                                        data-nombresede="<?= $sede->nombresede; ?>"
+                                        data-nombreempresa="<?= $sede->nombreempresa; ?>"
                                         <?= ($sede->idempresa == $date->idempresa) ? 'selected' : ''; ?>>
                                         <?= $sede->nombreempresa; ?>
                                     </option>
@@ -96,8 +98,8 @@ $date = $obj3->mostrarUsuario($identificador);
                         </select>
 
                         <div class="invalid-feedback">Este campo es obligatorio.</div>
+                        <input type="hidden" id="nombre_sede" name="nombre_sede">
                     </div>
-
                     <div class="col-md-4">
                         <label for="turno" class="form-label">TURNO <span class="asterisco"
                                 title="Campo obligatorio">*</span></label>
@@ -166,6 +168,25 @@ $date = $obj3->mostrarUsuario($identificador);
         </div>
     </form>
 </div>
+
+<script>
+    $(document).ready(function() {
+        var selectedOption = $('#id_empresa').find('option:selected');
+        var nombreSede = selectedOption.data('nombresede');
+        $('#nombre_sede').val(nombreSede);
+        
+        $('#id_empresa').change(function() {
+            // Obtener la opción seleccionada
+            var selectedOption = $(this).find('option:selected');
+
+            // Obtener el nombre de la sede (usando data-* para almacenar el valor)
+            var nombreSede = selectedOption.data('nombresede');
+
+            // Asignar el valor al input invisible
+            $('#nombre_sede').val(nombreSede);
+        });
+    });
+</script>
 
 <!-- AJAX EDITAR USUARIOS -->
 <script>

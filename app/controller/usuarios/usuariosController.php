@@ -87,9 +87,9 @@ class usuariosController
         return ($this->model->verUsuario($idusuario)) ? $this->model->verUsuario($idusuario) : header("Location:usuarios.php");
     }
 
-    public function actualizarUsuario($idusuario, $nombreusuario, $tipodocumento, $dni, $correo, $pass, $celular, $idempresa, $turno, $idrol, $fechaingreso)
+    public function actualizarUsuario($idusuario, $nombreusuario, $tipodocumento, $dni, $correo, $pass, $celular, $idempresa, $sede, $turno, $idrol, $fechaingreso)
     {
-        $response = $this->model->editarUsuario($idusuario, $nombreusuario, $tipodocumento, $dni, $correo, $pass, $celular, $idempresa, $turno, $idrol, $fechaingreso);
+        $response = $this->model->editarUsuario($idusuario, $nombreusuario, $tipodocumento, $dni, $correo, $pass, $celular, $idempresa, $sede, $turno, $idrol, $fechaingreso);
 
         // Enviar la respuesta en formato JSON
         echo json_encode($response);

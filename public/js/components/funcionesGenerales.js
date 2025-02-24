@@ -58,3 +58,9 @@ function obtenerFechaLima() {
 function formatearFecha(fecha) {
   return fecha.toISOString().split("T")[0]; // Formato: YYYY-MM-DD
 }
+
+function formatearFechaVista(fecha) {
+  var partes = fecha.split("-");
+  return partes[2] + "-" + partes[1] + "-" + partes[0];
+}
+
